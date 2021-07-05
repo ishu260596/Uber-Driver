@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -15,6 +16,7 @@ import android.widget.ProgressBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.cazaea.sweetalert.SweetAlertDialog
 import com.github.ybq.android.spinkit.style.Circle
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.auth.FirebaseAuth
@@ -156,11 +158,12 @@ class DriverDetailsActivity : AppCompatActivity() {
     }
 
     private fun updatePreference() {
-        PreferenceHelper.writeStringToPreference(KEY_DRIVER_DISPLAY_NAME, "$fName $lName")
+        val name = "$fName $lName"
+        Log.d("tag", name)
+        PreferenceHelper.writeStringToPreference(KEY_DRIVER_DISPLAY_NAME, name)
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_MOBILE_NUMBER, mobile)
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_TAXI_MODEL, modelNumber)
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_MOBILE_NUMBER, mobile)
-        PreferenceHelper.writeStringToPreference(KEY_DRIVER_TAXI_MODEL, modelNumber)
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_GOOGLE_GMAIL, email)
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_TAXI_NUMBER, taxiNumber)
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_PROFILE_URL, profileImage)
@@ -326,7 +329,12 @@ class DriverDetailsActivity : AppCompatActivity() {
                 )
             }
         } else if (requestCode == GALLERY) {
-            progressBar.visibility = View.VISIBLE
+//            progressBar.visibility = View.VISIBLE
+            val pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
+            pDialog.progressHelper.barColor = Color.parseColor("#CF7351")
+            pDialog.titleText = "Loading"
+            pDialog.setCancelable(false)
+            pDialog.show()
             data?.let {
                 // Here we will get the select image URI.
                 val thumbnail: Uri? = data.data
@@ -339,7 +347,8 @@ class DriverDetailsActivity : AppCompatActivity() {
                                 OnSuccessListener<Uri> { uri ->
                                     val url = uri.toString()
                                     profileImage = url.toString()
-                                    progressBar.visibility = View.GONE
+//                                    progressBar.visibility = View.GONE
+                                    pDialog.cancel()
                                     AestheticDialog.Builder(
                                         this@DriverDetailsActivity,
                                         DialogStyle.TOASTER,
