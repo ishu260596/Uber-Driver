@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/container2"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cred"
+    android:clipChildren="false">
+
+    <club.cred.synth.views.SynthImageButton
+        android:id="@+id/btnBackOtp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_20sdp"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:background="@android:color/transparent"
+        android:nextFocusUp="@color/cred"
+        android:padding="@dimen/_4sdp"
+        android:src="@drawable/ic_arrow_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvMobile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:fontFamily="@font/roboto_light"
+        android:text="@string/_91"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_17sdp"
+        app:layout_constraintStart_toStartOf="@+id/TvEnterOtp"
+        app:layout_constraintTop_toBottomOf="@id/TvEnterOtp" />
+
+    <TextView
+        android:id="@+id/TvEnterOtp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_35sdp"
+        android:layout_marginEnd="@dimen/_20sdp"
+        android:fontFamily="@font/roboto_light"
+        android:text="@string/enter_the_6_digit_code_sent_to_your_number"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_20sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/btnBackOtp"
+        app:layout_constraintTop_toBottomOf="@id/btnBackOtp" />
+
+
+    <com.mukesh.OtpView
+        android:id="@+id/otp_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="44dp"
+        android:fontFamily="@font/roboto_light"
+        android:hint="000000"
+        android:inputType="number"
+        android:itemBackground="@color/cred"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        android:textSize="@dimen/_20sdp"
+        app:OtpItemCount="6"
+        app:OtpLineColor="@color/light_orange"
+        app:OtpViewType="line"
+        app:layout_constraintStart_toStartOf="@id/tvMobile"
+        app:layout_constraintTop_toBottomOf="@id/tvMobile" />
+
+    <club.cred.synth.views.SynthButton
+        android:id="@+id/btnNextOtp"
+        layout_marginBottom="@dimen/_20sdp"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_marginStart="@dimen/_40sdp"
+        android:layout_marginEnd="@dimen/_40sdp"
+        android:layout_marginBottom="@dimen/_25sdp"
+        android:fontFamily="@font/roboto_light"
+        android:gravity="center"
+        android:text="@string/next"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_17sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:neuButtonType="elevated_soft"
+        app:neuPlatformAppearance="@style/button_platform_appearance" />
+
+    <TextView
+        android:id="@+id/tvResendCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_30sdp"
+        android:text="@string/resend_code_in_30_sec"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="@+id/otp_view"
+        app:layout_constraintTop_toBottomOf="@+id/otp_view" />
+
+
+    <!--    <LinearLayout-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="@dimen/_20sdp"-->
+    <!--        android:layout_marginTop="@dimen/_25sdp"-->
+    <!--        android:orientation="horizontal"-->
+    <!--        app:layout_constraintTop_toBottomOf="@id/TvEnterOtp">-->
+
+    <!--        <EditText-->
+    <!--            android:layout_width="@dimen/_40sdp"-->
+    <!--            android:layout_height="@dimen/_45sdp"-->
+    <!--            android:backgroundTint="@color/white"-->
+    <!--            android:fontFamily="@font/roboto_light"-->
+    <!--            android:gravity="center"-->
+    <!--            android:hint="0"-->
+    <!--            android:imeOptions="actionNext"-->
+    <!--            android:importantForAutofill="auto"-->
+    <!--            android:inputType="number"-->
+    <!--            android:maxLength="1"-->
+    <!--            android:textColor="@color/white"-->
+    <!--            android:textColorHint="@color/light_grey"-->
+    <!--            android:textSize="@dimen/_24sdp" />-->
+
+    <!--        <EditText-->
+    <!--            android:layout_width="@dimen/_40sdp"-->
+    <!--            android:layout_height="@dimen/_45sdp"-->
+    <!--            android:layout_marginStart="@dimen/_4sdp"-->
+    <!--            android:backgroundTint="@color/white"-->
+    <!--            android:fontFamily="@font/roboto_light"-->
+    <!--            android:gravity="center"-->
+    <!--            android:hint="0"-->
+    <!--            android:imeOptions="actionNext"-->
+    <!--            android:importantForAutofill="auto"-->
+    <!--            android:inputType="number"-->
+    <!--            android:maxLength="1"-->
+    <!--            android:textColor="@color/white"-->
+
+    <!--            android:textColorHint="@color/light_grey"-->
+    <!--            android:textSize="@dimen/_24sdp" />-->
+
+    <!--        <EditText-->
+    <!--            android:layout_width="@dimen/_40sdp"-->
+    <!--            android:layout_height="@dimen/_45sdp"-->
+    <!--            android:layout_marginStart="@dimen/_4sdp"-->
+    <!--            android:backgroundTint="@color/white"-->
+    <!--            android:fontFamily="@font/roboto_light"-->
+    <!--            android:gravity="center"-->
+    <!--            android:hint="0"-->
+    <!--            android:imeOptions="actionNext"-->
+    <!--            android:importantForAutofill="auto"-->
+    <!--            android:inputType="number"-->
+    <!--            android:maxLength="1"-->
+    <!--            android:textColor="@color/white"-->
+    <!--            android:textColorHint="@color/light_grey"-->
+    <!--            android:textSize="@dimen/_24sdp" />-->
+
+    <!--        <EditText-->
+    <!--            android:layout_width="@dimen/_40sdp"-->
+    <!--            android:layout_height="@dimen/_45sdp"-->
+    <!--            android:layout_marginStart="@dimen/_4sdp"-->
+    <!--            android:backgroundTint="@color/white"-->
+    <!--            android:fontFamily="@font/roboto_light"-->
+    <!--            android:gravity="center"-->
+    <!--            android:hint="0"-->
+    <!--            android:imeOptions="actionDone"-->
+    <!--            android:importantForAutofill="auto"-->
+    <!--            android:inputType="number"-->
+    <!--            android:maxLength="1"-->
+    <!--            android:textColor="@color/white"-->
+    <!--            android:textColorHint="@color/light_grey"-->
+    <!--            android:textSize="@dimen/_24sdp" />-->
+
+    <!--    </LinearLayout>-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

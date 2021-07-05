@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cred"
+    android:clipChildren="false"
+    tools:context=".ui.activities.GetStartedActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/_32sdp"
+            android:fontFamily="@font/roboto_light"
+            android:text="@string/rover"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_32sdp" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_200sdp"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="car.json"
+            app:lottie_loop="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:fontFamily="@font/roboto_light"
+            android:text="@string/move_with_safety"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_22sdp" />
+    </LinearLayout>
+
+
+    <club.cred.synth.views.SynthButton
+        android:id="@+id/btnGetStarted"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_50sdp"
+        android:layout_marginLeft="@dimen/_16sdp"
+        android:layout_marginRight="@dimen/_16sdp"
+        android:layout_marginBottom="@dimen/_50sdp"
+        android:drawableEnd="@drawable/ic_forward_arrow"
+        android:drawablePadding="@dimen/_16sdp"
+        android:fontFamily="@font/roboto_light"
+        android:gravity="center"
+        android:padding="@dimen/_12sdp"
+        android:text="@string/get_started"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_16sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:neuButtonRadius="@dimen/_20sdp"
+        app:neuButtonType="elevated_flat"
+        app:neuFlatButtonColor="@color/dark_blue" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

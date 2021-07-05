@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_driver_navigation"
+    app:startDestination="@+id/driver_home"
+   >
+
+    <fragment
+        android:id="@+id/driver_home"
+        android:name="com.masai.uber.ui.fragments.DriverHomeFragment"
+        android:label="@string/Driver_home"
+        tools:layout="@layout/fragment_driver_home" />
+
+<!--    <fragment-->
+<!--        android:id="@+id/signOut"-->
+<!--        android:name="com.masai.uber.ui.fragments.DriversMapFragment"-->
+<!--        android:label="@string/menu_home"-->
+<!--       />-->
+
+</navigation>

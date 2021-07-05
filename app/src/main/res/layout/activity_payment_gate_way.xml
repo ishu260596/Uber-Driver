@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cred"
+    android:clipChildren="false">
+
+    <TextView
+        android:id="@+id/tvDoLater"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:layout_marginEnd="20sp"
+        android:fontFamily="@font/roboto_light"
+        android:padding="@dimen/_3sdp"
+        android:text="@string/do_this_later"
+        android:textColor="@color/link_light"
+        android:textSize="@dimen/_19sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/TextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_20sdp"
+        android:layout_marginTop="@dimen/_25sdp"
+        android:padding="@dimen/_3sdp"
+        android:text="@string/select_your_preferred_payment_method"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_18sdp"
+        app:layout_constraintEnd_toEndOf="@id/tvDoLater"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvDoLater" />
+
+    <club.cred.synth.views.SynthButton
+        android:id="@+id/btnAmazonPay"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_marginTop="@dimen/_25sdp"
+        android:drawablePadding="@dimen/_10sdp"
+        android:gravity="center"
+        android:padding="@dimen/_10sdp"
+        android:text="@string/amazon"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_14sdp"
+        app:layout_constraintStart_toStartOf="@id/TextView"
+        app:layout_constraintTop_toBottomOf="@id/TextView"
+        app:neuButtonDrawable="@drawable/ic_amazone_pay"
+        app:neuButtonDrawablePitRadius="20dp"
+        app:neuButtonType="elevated_soft"
+        app:neuPlatformAppearance="@style/button_platform_appearance" />
+
+    <club.cred.synth.views.SynthButton
+        android:id="@+id/btnGooglePay"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_marginTop="@dimen/_15sdp"
+        android:drawablePadding="@dimen/_10sdp"
+        android:gravity="center"
+        android:padding="@dimen/_10sdp"
+        android:text="@string/google_pay"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_14sdp"
+        app:layout_constraintEnd_toEndOf="@+id/btnAmazonPay"
+        app:layout_constraintStart_toStartOf="@id/btnAmazonPay"
+        app:layout_constraintTop_toBottomOf="@id/btnAmazonPay"
+        app:neuButtonDrawable="@drawable/ic_google_pay"
+        app:neuButtonDrawablePitRadius="20dp"
+        app:neuButtonType="elevated_soft"
+        app:neuPlatformAppearance="@style/button_platform_appearance" />
+
+    <club.cred.synth.views.SynthButton
+        android:id="@+id/btnPaytm"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_marginTop="@dimen/_15sdp"
+        android:drawablePadding="@dimen/_10sdp"
+        android:gravity="center"
+        android:padding="@dimen/_10sdp"
+        android:text="@string/paytm"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_14sdp"
+        app:layout_constraintEnd_toEndOf="@+id/btnGooglePay"
+        app:layout_constraintStart_toStartOf="@id/btnGooglePay"
+        app:layout_constraintTop_toBottomOf="@id/btnGooglePay"
+        app:neuButtonDrawable="@drawable/ic_paytm"
+        app:neuButtonDrawablePitRadius="20dp"
+        app:neuButtonType="elevated_soft"
+        app:neuPlatformAppearance="@style/button_platform_appearance" />
+
+    <club.cred.synth.views.SynthButton
+        android:id="@+id/btnCard"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_marginTop="@dimen/_15sdp"
+        android:drawablePadding="@dimen/_10sdp"
+        android:gravity="center"
+        android:padding="@dimen/_10sdp"
+        android:text="@string/card"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_14sdp"
+        app:layout_constraintEnd_toEndOf="@+id/btnPaytm"
+        app:layout_constraintStart_toStartOf="@id/btnPaytm"
+        app:layout_constraintTop_toBottomOf="@id/btnPaytm"
+        app:neuButtonDrawable="@drawable/ic_creditcard"
+        app:neuButtonDrawablePitRadius="20dp"
+        app:neuButtonType="elevated_soft"
+        app:neuPlatformAppearance="@style/button_platform_appearance" />
+
+
+    <club.cred.synth.views.SynthButton
+        android:id="@+id/btnCash"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_marginTop="@dimen/_15sdp"
+        android:drawablePadding="@dimen/_10sdp"
+        android:gravity="center"
+        android:padding="@dimen/_10sdp"
+        android:text="@string/cash"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_14sdp"
+        app:layout_constraintEnd_toEndOf="@+id/btnCard"
+        app:layout_constraintStart_toStartOf="@id/btnCard"
+        app:layout_constraintTop_toBottomOf="@id/btnCard"
+        app:neuButtonDrawable="@drawable/ic_cash"
+        app:neuButtonDrawablePitRadius="20dp"
+        app:neuButtonType="elevated_soft"
+        app:neuPlatformAppearance="@style/button_platform_appearance" />
+
+    <club.cred.synth.views.SynthButton
+        android:id="@+id/btnGiftCard"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_marginTop="@dimen/_15sdp"
+        android:drawablePadding="@dimen/_10sdp"
+        android:gravity="center"
+        android:padding="@dimen/_10sdp"
+        android:text="@string/gift"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_14sdp"
+        app:layout_constraintEnd_toEndOf="@+id/btnCash"
+        app:layout_constraintStart_toStartOf="@id/btnCash"
+        app:layout_constraintTop_toBottomOf="@id/btnCash"
+        app:neuButtonDrawable="@drawable/ic_gift_card"
+        app:neuButtonDrawablePitRadius="20dp"
+        app:neuButtonType="elevated_soft"
+        app:neuPlatformAppearance="@style/button_platform_appearance" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
