@@ -69,10 +69,16 @@ For WRITE EXTERNAL STORAGE warning you can have a look at this article I hope it
         <activity
             android:name=".ui.activities.PhoneVerificationActivity"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".ui.activities.GetStartedActivity"/>
+        <activity android:name=".ui.activities.GetStartedActivity" />
         <activity
             android:name=".ui.activities.MainActivity"
             android:windowSoftInputMode="adjustResize" />
+
+        <service android:name=".services.MyFirebaseServices">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_SERVICE" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

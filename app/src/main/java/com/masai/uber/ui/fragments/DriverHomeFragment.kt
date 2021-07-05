@@ -30,7 +30,7 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import com.masai.uber.R
 import com.masai.uber.databinding.FragmentDriverHomeBinding
-import com.masai.uber.utlis.DRIVER_LOCATION_REFERENCE
+import com.masai.uber.utlis.KEY_DRIVER_LOCATION_REFERENCE
 import com.masai.uber.utlis.MAP_VIEW_BUNDLE_KEY
 import com.thecode.aestheticdialogs.AestheticDialog
 import com.thecode.aestheticdialogs.DialogStyle
@@ -105,8 +105,8 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
         userId = mAuth.currentUser?.uid.toString()
         onlineRef = FirebaseDatabase.getInstance().reference
             .child(".info/connected")
-        driverLocationRef = FirebaseDatabase.getInstance().getReference(DRIVER_LOCATION_REFERENCE)
-        currentUserRef = FirebaseDatabase.getInstance().getReference(DRIVER_LOCATION_REFERENCE)
+        driverLocationRef = FirebaseDatabase.getInstance().getReference(KEY_DRIVER_LOCATION_REFERENCE)
+        currentUserRef = FirebaseDatabase.getInstance().getReference(KEY_DRIVER_LOCATION_REFERENCE)
             .child(userId)
         geoFire = GeoFire(driverLocationRef)
 
