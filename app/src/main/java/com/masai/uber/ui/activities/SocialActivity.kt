@@ -108,25 +108,19 @@ class SocialActivity : AppCompatActivity() {
                 Toast.makeText(this, "Welcome ${account.displayName}", Toast.LENGTH_SHORT)
                     .show()
                 updatePreference()
-                val intent = Intent(this, DriverHomeActivity::class.java)
-                intent.putExtra("UserName", name)
-                intent.putExtra("UserEmail", email)
-                intent.putExtra("UserPhoto", profileUrl)
-                intent.putExtra("uid", uId)
-                saveUser()
-                startActivity(intent)
-                finish()
+                redirect()
+
             } else {
                 AestheticDialog.Builder(this, DialogStyle.TOASTER, DialogType.ERROR)
                     .setTitle("Failed")
                     .show()
             }
         } catch (e: Exception) {
-
+            e.printStackTrace()
         }
     }
 
-    private fun updatePreference( ) {
+    private fun updatePreference() {
         PreferenceHelper.writeBooleanToPreference(KEY_DRIVER_LOGGED_IN, true)
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_GOOGLE_ID, uId)
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_DISPLAY_NAME, name)
@@ -134,33 +128,9 @@ class SocialActivity : AppCompatActivity() {
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_PROFILE_URL, profileUrl)
     }
 
-    private fun saveUser() {
-        val hashMap: HashMap<String, String> = HashMap<String, String>()
-        hashMap["name"] = name
-        hashMap["email"] =email
-        hashMap["userId"] = userId
-        hashMap["uId"] = uId
-        hashMap["profileUrl"] = profileUrl
-        userDatabaseRef.child("Drivers").child(userId).setValue(hashMap)
-            .addOnCompleteListener {
-                AestheticDialog.Builder(this, DialogStyle.TOASTER, DialogType.SUCCESS)
-                    .setTitle("Completed")
-                    .show()
-
-                redirect()
-            }
-            .addOnFailureListener {
-                AestheticDialog.Builder(this, DialogStyle.TOASTER, DialogType.ERROR)
-                    .setTitle("Failed")
-                    .show()
-            }
-
-    }
-
     private fun redirect() {
-        startActivity(
-            Intent(this, DriverHomeActivity::class.java)
-        )
+        val intent = Intent(this, DriverDetailsActivity::class.java)
+        startActivity(intent)
         finish()
     }
 

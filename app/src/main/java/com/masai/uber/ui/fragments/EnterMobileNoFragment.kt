@@ -32,6 +32,7 @@ class FragmentEnterMobileNo : Fragment() {
         binding!!.tvSocialMedia.setOnClickListener {
             startActivity(
                 Intent(requireContext(), SocialActivity::class.java))
+            activity?.finish()
         }
 
         binding!!.btnNext.setOnClickListener {
@@ -40,6 +41,7 @@ class FragmentEnterMobileNo : Fragment() {
                 val intent = Intent(requireContext(), PhoneVerificationActivity::class.java)
                 intent.putExtra("number", binding!!.etMobileNumber.text.toString())
                 startActivity(intent)
+                activity?.finish()
             } else binding!!.etMobileNumber.error = "Please provide a valid mobile number"
         }
     }

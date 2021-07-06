@@ -62,6 +62,7 @@ class DriverDetailsActivity : AppCompatActivity() {
     private lateinit var taxiNumber: String
     private lateinit var modelNumber: String
     private lateinit var license: String
+    private lateinit var password: String
 
     companion object {
         private const val CAMERA = 1
@@ -74,6 +75,7 @@ class DriverDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         mBinding = ActivityDriverDetailsBinding.inflate(layoutInflater)
         setContentView(mBinding!!.root)
+
         initViews()
         mBinding!!.ivAddProfileImage.setOnClickListener {
             customImageSelectionDialog()
@@ -90,7 +92,9 @@ class DriverDetailsActivity : AppCompatActivity() {
         databaseRef = FirebaseDatabase.getInstance().reference
         profilePicRef = FirebaseStorage.getInstance().reference
         progressBar = findViewById(R.id.spin_kit)
-
+        if (intent != null && intent.extras != null) {
+            password = intent.getStringExtra("password").toString()
+        }
         val user = mAuth.currentUser
         if (user != null) {
             FirebaseMessaging.getInstance().token
@@ -163,8 +167,10 @@ class DriverDetailsActivity : AppCompatActivity() {
         hashMap["taxinumber"] = taxiNumber
         hashMap["model"] = modelNumber
         hashMap["profileurl"] = profileImage
+        hashMap["userId"] = userId
+        hashMap["password"] = password
         databaseRef.child("Drivers").child(userId).setValue(hashMap)
-            .addOnCompleteListener {
+            .addOnSuccessListener {
                 AestheticDialog.Builder(this, DialogStyle.TOASTER, DialogType.SUCCESS)
                     .setTitle("Success")
                     .show()
