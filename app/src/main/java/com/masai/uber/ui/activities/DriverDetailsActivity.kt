@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -12,14 +13,18 @@ import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.cazaea.sweetalert.SweetAlertDialog
 import com.github.ybq.android.spinkit.style.Circle
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
@@ -85,6 +90,23 @@ class DriverDetailsActivity : AppCompatActivity() {
         databaseRef = FirebaseDatabase.getInstance().reference
         profilePicRef = FirebaseStorage.getInstance().reference
         progressBar = findViewById(R.id.spin_kit)
+
+        val user = mAuth.currentUser
+        if (user != null) {
+            FirebaseMessaging.getInstance().token
+                .addOnCompleteListener(OnCompleteListener { task ->
+                    if (!task.isSuccessful) {
+                        AestheticDialog.Builder(this, DialogStyle.TOASTER, DialogType.ERROR)
+                            .setTitle("Failed")
+                            .show()
+                        return@OnCompleteListener
+                    }
+                    // Get new FCM registration token
+                    val token = task.result
+                    Log.d("Token", token.toString())
+                    UserUtils.updateToken(this, token)
+                })
+        }
     }
 
     private fun verifyCredentials() {
@@ -156,11 +178,12 @@ class DriverDetailsActivity : AppCompatActivity() {
     }
 
     private fun updatePreference() {
-        PreferenceHelper.writeStringToPreference(KEY_DRIVER_DISPLAY_NAME, "$fName $lName")
+        val name = "$fName $lName"
+        Log.d("tag", name)
+        PreferenceHelper.writeStringToPreference(KEY_DRIVER_DISPLAY_NAME, name)
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_MOBILE_NUMBER, mobile)
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_TAXI_MODEL, modelNumber)
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_MOBILE_NUMBER, mobile)
-        PreferenceHelper.writeStringToPreference(KEY_DRIVER_TAXI_MODEL, modelNumber)
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_GOOGLE_GMAIL, email)
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_TAXI_NUMBER, taxiNumber)
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_PROFILE_URL, profileImage)
@@ -311,12 +334,6 @@ class DriverDetailsActivity : AppCompatActivity() {
                     })
 
                 }
-                // Set Capture Image bitmap to the imageView using Glide
-                /**  Glide.with(this@DriverDetailsActivity)
-                .load(thumbnail)
-                .centerCrop()
-                .into(mBinding!!.profileImage) **/
-
                 // Replace the add icon with edit icon once the image is loaded.
                 mBinding!!.ivAddProfileImage.setImageDrawable(
                     ContextCompat.getDrawable(
@@ -326,7 +343,12 @@ class DriverDetailsActivity : AppCompatActivity() {
                 )
             }
         } else if (requestCode == GALLERY) {
-            progressBar.visibility = View.VISIBLE
+//            progressBar.visibility = View.VISIBLE
+            val pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
+            pDialog.progressHelper.barColor = Color.parseColor("#CF7351")
+            pDialog.titleText = "Loading"
+            pDialog.setCancelable(false)
+            pDialog.show()
             data?.let {
                 // Here we will get the select image URI.
                 val thumbnail: Uri? = data.data
@@ -339,7 +361,8 @@ class DriverDetailsActivity : AppCompatActivity() {
                                 OnSuccessListener<Uri> { uri ->
                                     val url = uri.toString()
                                     profileImage = url.toString()
-                                    progressBar.visibility = View.GONE
+//                                    progressBar.visibility = View.GONE
+                                    pDialog.cancel()
                                     AestheticDialog.Builder(
                                         this@DriverDetailsActivity,
                                         DialogStyle.TOASTER,
@@ -351,36 +374,6 @@ class DriverDetailsActivity : AppCompatActivity() {
                     })
 
                 }
-
-                // Set Selected Image URI to the imageView using Glide
-                /**  Glide.with(this@DriverDetailsActivity)
-                .load(selectedPhotoUri)
-                .centerCrop()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .listener(object : RequestListener<Drawable> {
-                override fun onLoadFailed(
-                @Nullable e: GlideException?,
-                model: Any?,
-                target: Target<Drawable>?,
-                isFirstResource: Boolean
-                ): Boolean {
-                // log exception
-                Log.e("TAG", "Error loading image", e)
-                return false // important to return false so the error placeholder can be placed
-                }
-
-                override fun onResourceReady(
-                resource: Drawable,
-                model: Any?,
-                target: Target<Drawable>?,
-                dataSource: DataSource?,
-                isFirstResource: Boolean
-                ): Boolean {
-                val bitmap: Bitmap = resource.toBitmap()
-                return false
-                }
-                })
-                .into(mBinding!!.profileImage)  **/
 
                 // Replace the add icon with edit icon once the image is selected.
                 mBinding!!.ivAddProfileImage.setImageDrawable(

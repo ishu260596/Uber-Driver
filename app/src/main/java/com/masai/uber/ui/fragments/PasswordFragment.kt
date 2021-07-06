@@ -84,7 +84,6 @@ class PasswordFragment : Fragment() {
     private fun redirect() {
         startActivity(Intent(context, DriverDetailsActivity::class.java))
         activity?.finish()
-
     }
 
     override fun onDestroy() {

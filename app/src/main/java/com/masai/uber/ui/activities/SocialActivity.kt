@@ -90,7 +90,7 @@ class SocialActivity : AppCompatActivity() {
                     if (task.isSuccessful) {
                         val user: FirebaseUser? = mAuth.currentUser
                         userId = user?.uid.toString()
-                        Toast.makeText(this, "${userId}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, userId, Toast.LENGTH_SHORT).show()
                         handleSignInResult(task1)
                     }
                 })
@@ -100,16 +100,20 @@ class SocialActivity : AppCompatActivity() {
         try {
             if (task!!.isSuccessful) {
                 val account = task.getResult(ApiException::class.java)
+                name = account.displayName.toString()
+                email = account.email.toString()
+                uId = account.id.toString()
+                profileUrl = account.photoUrl.toString()
                 PreferenceHelper.writeBooleanToPreference(KEY_LOGIN_WITH_OAUTH, true)
                 Toast.makeText(this, "Welcome ${account.displayName}", Toast.LENGTH_SHORT)
                     .show()
-                updatePreference(account!!)
+                updatePreference()
                 val intent = Intent(this, DriverHomeActivity::class.java)
-                intent.putExtra("UserName", account.displayName)
-                intent.putExtra("UserEmail", account.email)
-                intent.putExtra("UserPhoto", account.photoUrl?.toString())
-                intent.putExtra("uid", account.id)
-                saveUser(account)
+                intent.putExtra("UserName", name)
+                intent.putExtra("UserEmail", email)
+                intent.putExtra("UserPhoto", profileUrl)
+                intent.putExtra("uid", uId)
+                saveUser()
                 startActivity(intent)
                 finish()
             } else {
@@ -122,20 +126,21 @@ class SocialActivity : AppCompatActivity() {
         }
     }
 
-    private fun updatePreference(account: GoogleSignInAccount) {
+    private fun updatePreference( ) {
         PreferenceHelper.writeBooleanToPreference(KEY_DRIVER_LOGGED_IN, true)
-        PreferenceHelper.writeStringToPreference(KEY_DRIVER_GOOGLE_ID, account.id)
-        PreferenceHelper.writeStringToPreference(KEY_DRIVER_DISPLAY_NAME, account.displayName)
-        PreferenceHelper.writeStringToPreference(KEY_DRIVER_GOOGLE_GMAIL, account.email)
+        PreferenceHelper.writeStringToPreference(KEY_DRIVER_GOOGLE_ID, uId)
+        PreferenceHelper.writeStringToPreference(KEY_DRIVER_DISPLAY_NAME, name)
+        PreferenceHelper.writeStringToPreference(KEY_DRIVER_GOOGLE_GMAIL, email)
+        PreferenceHelper.writeStringToPreference(KEY_DRIVER_PROFILE_URL, profileUrl)
     }
 
-    private fun saveUser(account: GoogleSignInAccount) {
+    private fun saveUser() {
         val hashMap: HashMap<String, String> = HashMap<String, String>()
-        hashMap["name"] = account.displayName
-        hashMap["email"] = account.email
+        hashMap["name"] = name
+        hashMap["email"] =email
         hashMap["userId"] = userId
-        hashMap["uId"] = account.id
-        hashMap["profileUrl"] = account.photoUrl.toString()
+        hashMap["uId"] = uId
+        hashMap["profileUrl"] = profileUrl
         userDatabaseRef.child("Drivers").child(userId).setValue(hashMap)
             .addOnCompleteListener {
                 AestheticDialog.Builder(this, DialogStyle.TOASTER, DialogType.SUCCESS)
@@ -150,69 +155,12 @@ class SocialActivity : AppCompatActivity() {
                     .show()
             }
 
-        /**   dbUsers.addListenerForSingleValueEvent(object : ValueEventListener {
-        override fun onDataChange(snapshot: DataSnapshot) {
-        if (snapshot.exists()) {
-        //even if user exit in database the FCM token will be different for each device
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-        if (task.isSuccessful) {
-        val user = FirebaseDatabase.getInstance().getReference("users")
-        .child(account.id!!)
-        val token = Objects.requireNonNull(task.result)
-        user.child("token").setValue(token)
-        } else {
-        Log.d("TAG", "onComplete: " + task.exception!!.message)
-        }
-        }
-        Toast.makeText(
-        this@SocialActivity,
-        "Welcome Back ${account.displayName}",
-        Toast.LENGTH_SHORT
-        )
-        .show()
-        return
-        }
-        if (!snapshot.exists()) {
-        FirebaseMessaging.getInstance().token.addOnCompleteListener {
-        if (it.isSuccessful) {
-        val token: String = Objects.requireNonNull<String>(it.result)
-        val username: String = ""
-        val user =
-        UserModel(
-        account.email!!,
-        account.displayName,
-        username,
-        account.photoUrl?.toString(),
-        null,
-        token
-        )
-
-        dbUsers.setValue(user)
-        .addOnCompleteListener { it_inside ->
-        if (it_inside.isSuccessful) {
-        Toast.makeText(
-        this@SocialActivity,
-        "token saved",
-        Toast.LENGTH_SHORT
-        )
-        .show()
-        }
-        }
-        }
-        }
-        }
-        }
-
-        override fun onCancelled(error: DatabaseError) {
-        TODO("Not yet implemented")
-        }
-        }) **/
-
     }
 
     private fun redirect() {
         startActivity(
-            Intent(this, DriverHomeActivity::class.java))
+            Intent(this, DriverHomeActivity::class.java)
+        )
         finish()
     }
 

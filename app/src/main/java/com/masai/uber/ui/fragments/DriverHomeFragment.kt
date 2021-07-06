@@ -30,7 +30,7 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import com.masai.uber.R
 import com.masai.uber.databinding.FragmentDriverHomeBinding
-import com.masai.uber.utlis.DRIVER_LOCATION_REFERENCE
+import com.masai.uber.utlis.KEY_DRIVER_LOCATION_REFERENCE
 import com.masai.uber.utlis.MAP_VIEW_BUNDLE_KEY
 import com.thecode.aestheticdialogs.AestheticDialog
 import com.thecode.aestheticdialogs.DialogStyle
@@ -104,9 +104,9 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
         mAuth = FirebaseAuth.getInstance()
         userId = mAuth.currentUser?.uid.toString()
         onlineRef = FirebaseDatabase.getInstance().reference
-            .child("info/connected")
-        driverLocationRef = FirebaseDatabase.getInstance().getReference(DRIVER_LOCATION_REFERENCE)
-        currentUserRef = FirebaseDatabase.getInstance().getReference(DRIVER_LOCATION_REFERENCE)
+            .child(".info/connected")
+        driverLocationRef = FirebaseDatabase.getInstance().getReference(KEY_DRIVER_LOCATION_REFERENCE)
+        currentUserRef = FirebaseDatabase.getInstance().getReference(KEY_DRIVER_LOCATION_REFERENCE)
             .child(userId)
         geoFire = GeoFire(driverLocationRef)
 
@@ -119,7 +119,6 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
         mLocationReq.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 
         mLocationCallback = object : com.google.android.gms.location.LocationCallback() {
-
             override fun onLocationResult(locationResult: LocationResult) {
                 super.onLocationResult(locationResult)
                 val newPosition = LatLng(
@@ -132,12 +131,9 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
                 )
 
                 //update location
-                geoFire.setLocation(
-                    userId, GeoLocation(
+                geoFire.setLocation(userId, GeoLocation(
                         locationResult.lastLocation.latitude,
-                        locationResult.lastLocation.longitude
-                    )
-                ) { key, error ->
+                        locationResult.lastLocation.longitude)) { key, error ->
                     if (error != null) {
                         AestheticDialog.Builder(
                             requireActivity(),
@@ -160,10 +156,6 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
                 }
             }
 
-            override fun onLocationAvailability(p0: LocationAvailability) {
-                super.onLocationAvailability(p0)
-            }
-
         }
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
@@ -182,8 +174,7 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
         mFusedLocationClient.requestLocationUpdates(
             mLocationReq,
             mLocationCallback,
-            Looper.myLooper()
-        )
+            Looper.myLooper())
     }
 
     override fun onMapReady(mMap: GoogleMap) {
@@ -289,23 +280,6 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
 
             }).onSameThread()
             .check()
-
-
-        /**  try {
-        val success = mMap.setMapStyle(
-        MapStyleOptions.loadRawResourceStyle(
-        context,
-        R.raw.uber_maps_style
-        )
-        )
-        if (!success) {
-        Log.d("tag", "error")
-        }
-        } catch (e: Exception) {
-        e.printStackTrace()
-        Log.d("tag", "error")
-        }**/
-
     }
 
     private fun showRationalDialogForPermissions() {
