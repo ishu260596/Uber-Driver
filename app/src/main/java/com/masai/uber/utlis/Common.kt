@@ -19,13 +19,13 @@ class Common {
             context: Context,
             id: Int,
             title: String?,
-            content: String?,
+            body: String?,
             intent: Intent?
         ) {
 
             var pendingIntent: PendingIntent? = null
-
-            if (intent != null) {
+//
+//            if (intent != null) {
                 pendingIntent = PendingIntent.getActivity(
                     context,
                     id, intent,
@@ -54,7 +54,7 @@ class Common {
                     .Builder(context, NOTIFICATION_CHANNEL_ID)
 
                 builder.setContentTitle(title)
-                    .setContentText(content)
+                    .setContentText(body )
                     .setAutoCancel(false)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setDefaults(Notification.DEFAULT_VIBRATE)
@@ -63,9 +63,7 @@ class Common {
                         BitmapFactory
                             .decodeResource(
                                 context.resources,
-                                R.drawable.ic_baseline_directions_car
-                            )
-                    )
+                                R.drawable.ic_baseline_directions_car))
 
                 if (pendingIntent != null) {
                     builder.setContentIntent(pendingIntent)
@@ -74,7 +72,7 @@ class Common {
 
                 notificationManager.notify(id, notification)
 
-            }
+//            }
         }
     }
 }

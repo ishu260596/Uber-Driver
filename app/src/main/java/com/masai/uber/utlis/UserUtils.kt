@@ -13,8 +13,8 @@ class UserUtils {
         fun updateToken(context: Context, token: String) {
             val tokenModel = TokenModel(token)
 
-            FirebaseDatabase.getInstance()
-                .reference.child(KEY_TOKEN_REFERENCE)
+
+            FirebaseDatabase.getInstance().getReference(KEY_TOKEN_REFERENCE)
                 .child(FirebaseAuth.getInstance().currentUser?.uid.toString())
                 .setValue(tokenModel)
                 .addOnFailureListener {

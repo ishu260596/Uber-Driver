@@ -2,10 +2,7 @@ package com.masai.uber.utlis
 
 import android.graphics.Color
 
-const val KEY_LOGIN_WITH_OAUTH = "KEY_LOGIN_WITH_OAUTH"
-
 const val KEY_DRIVER_LOCATION_REFERENCE = "DriverLocation"
-const val KEY_TOKEN_REFERENCE = "Token"
 
 const val KEY_DRIVER_LOGGED_IN = "KEY_DRIVER_LOGGED_IN"
 const val KEY_DRIVER_DISPLAY_NAME = "KEY_DRIVER_DISPLAY_NAME"
@@ -18,6 +15,7 @@ const val KEY_DRIVER_TAXI_NUMBER = "KEY_DRIVER_TAXI_NUMBER"
 const val KEY_DRIVER_TAXI_MODEL = "KEY_DRIVER_TAXI_MODEL"
 const val KEY_DRIVER_PROFILE_URL = "KEY_DRIVER_PROFILE_URL"
 const val KEY_DRIVER_RATING = "KEY_DRIVER_RATING"
+const val KEY_LOGIN_WITH_OAUTH = "KEY_LOGIN_WITH_OAUTH"
 
 // Map Options
 const val POLYLINE_COLOR = Color.RED
@@ -26,8 +24,9 @@ const val MAP_ZOOM = 15f
 const val MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey"
 
 //FireMessaging
-const val NOTIFICATION_TITLE = "NOTIFICATION_TITLE"
-const val NOTIFICATION_CONTENT = "NOTIFICATION_CONTENT"
+const val NOTIFICATION_TITLE = "title"
+const val NOTIFICATION_CONTENT = "body"
+const val KEY_TOKEN_REFERENCE = "Token"
 
 
 

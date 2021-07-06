@@ -35,7 +35,7 @@ class GetStartedActivity : AppCompatActivity() {
                     }
                     // Get new FCM registration token
                     val token = task.result
-                    Log.d("token", token.toString())
+                    Log.d("Token", token.toString())
                     UserUtils.updateToken(this, token)
                 })
         }

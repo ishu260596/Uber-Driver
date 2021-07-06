@@ -22,14 +22,12 @@ class MyFirebaseServices : FirebaseMessagingService() {
         super.onMessageReceived(s)
         val dataRec: Map<String, String> = s.data
 
-        if (dataRec != null) {
-            Common.showNotification(
-                this, Random.nextInt(),
-                dataRec[NOTIFICATION_TITLE],
-                dataRec[NOTIFICATION_CONTENT],
-                null
-            )
-        }
+        Common.showNotification(
+            this, Random.nextInt(),
+            dataRec[NOTIFICATION_TITLE],
+            dataRec[NOTIFICATION_CONTENT],
+            null
+        )
     }
 
 
