@@ -46,17 +46,6 @@ class FragmentEnterMobileNo : Fragment() {
         }
     }
 
-    /**   private fun launchActivity(s: String) {
-    val otpFragment = OTPFragment()
-    val bundle = Bundle()
-    bundle.putString("number", mobileNumber)
-    otpFragment.arguments = bundle
-    val transaction: FragmentTransaction = requireFragmentManager().beginTransaction()
-    transaction.replace(R.id.container, otpFragment)
-    transaction.addToBackStack("OTPFragment")
-    transaction.commit()
-    }  **/
-
     override fun onDestroy() {
         super.onDestroy()
         binding = null

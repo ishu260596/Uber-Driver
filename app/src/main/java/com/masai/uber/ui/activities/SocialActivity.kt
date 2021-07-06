@@ -1,9 +1,11 @@
 package com.masai.uber.ui.activities
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.cazaea.sweetalert.SweetAlertDialog
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -40,6 +42,8 @@ class SocialActivity : AppCompatActivity() {
     private lateinit var email: String
     private lateinit var uId: String
 
+    private lateinit var pDialog : SweetAlertDialog
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityNewSocialBinding.inflate(layoutInflater)
@@ -60,9 +64,15 @@ class SocialActivity : AppCompatActivity() {
         userDatabaseRef = FirebaseDatabase.getInstance().reference
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions)
 
+        pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
+        pDialog.progressHelper.barColor = Color.parseColor("#CF7351")
+        pDialog.titleText = "Please wait !"
+        pDialog.setCancelable(false)
+
         binding!!.btnGoogle.setOnClickListener {
             val intent: Intent = googleSignInClient.signInIntent
             startActivityForResult(intent, SIGN_IN_CODE)
+            pDialog.show()
         }
     }
 
@@ -107,6 +117,7 @@ class SocialActivity : AppCompatActivity() {
                 PreferenceHelper.writeBooleanToPreference(KEY_LOGIN_WITH_OAUTH, true)
                 Toast.makeText(this, "Welcome ${account.displayName}", Toast.LENGTH_SHORT)
                     .show()
+
                 updatePreference()
                 redirect()
 
@@ -129,6 +140,7 @@ class SocialActivity : AppCompatActivity() {
     }
 
     private fun redirect() {
+        pDialog.cancel()
         val intent = Intent(this, DriverDetailsActivity::class.java)
         startActivity(intent)
         finish()

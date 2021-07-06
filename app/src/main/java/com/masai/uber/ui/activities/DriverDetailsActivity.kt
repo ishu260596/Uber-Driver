@@ -62,14 +62,14 @@ class DriverDetailsActivity : AppCompatActivity() {
     private lateinit var taxiNumber: String
     private lateinit var modelNumber: String
     private lateinit var license: String
-    private lateinit var password: String
+    private var password: String = ""
+
+    private lateinit var pDialog: SweetAlertDialog
 
     companion object {
         private const val CAMERA = 1
         private const val GALLERY = 2
     }
-
-    private lateinit var progressBar: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,6 +81,7 @@ class DriverDetailsActivity : AppCompatActivity() {
             customImageSelectionDialog()
         }
         mBinding!!.btnNext.setOnClickListener {
+            pDialog.show()
             verifyCredentials()
         }
     }
@@ -91,7 +92,12 @@ class DriverDetailsActivity : AppCompatActivity() {
         userId = mAuth.currentUser?.uid.toString()
         databaseRef = FirebaseDatabase.getInstance().reference
         profilePicRef = FirebaseStorage.getInstance().reference
-        progressBar = findViewById(R.id.spin_kit)
+
+        pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
+        pDialog.progressHelper.barColor = Color.parseColor("#CF7351")
+        pDialog.titleText = "Please wait !"
+        pDialog.setCancelable(false)
+
         if (intent != null && intent.extras != null) {
             password = intent.getStringExtra("password").toString()
         }
@@ -120,45 +126,43 @@ class DriverDetailsActivity : AppCompatActivity() {
         mobile = mBinding!!.etMobileNumber.text.toString()
         license = mBinding!!.etLicenseNumber.text.toString()
         taxiNumber = mBinding!!.etCarNumber.text.toString()
-        modelNumber = mBinding!!.etMobileNumber.text.toString()
+        modelNumber = mBinding!!.etModelNumber.text.toString()
 
         if (fName.isEmpty()) {
             mBinding!!.etFirstName.error = "Fill this please !"
             return
         }
-        if (fName.isEmpty()) {
-            mBinding!!.etFirstName.error = "Fill this please !"
+        if (lName.isEmpty()) {
+            mBinding!!.etLastName.error = "Fill this please !"
             return
         }
-        if (fName.isEmpty()) {
-            mBinding!!.etFirstName.error = "Fill this please !"
+        if (email.isEmpty()) {
+            mBinding!!.etEmail.error = "Fill this please !"
             return
         }
-        if (fName.isEmpty()) {
-            mBinding!!.etFirstName.error = "Fill this please !"
+        if (mobile.isEmpty()) {
+            mBinding!!.etMobileNumber.error = "Fill this please !"
             return
         }
-        if (fName.isEmpty()) {
-            mBinding!!.etFirstName.error = "Fill this please !"
+        if (taxiNumber.isEmpty()) {
+            mBinding!!.etCarNumber.error = "Fill this please !"
             return
         }
-        if (fName.isEmpty()) {
-            mBinding!!.etFirstName.error = "Fill this please !"
+        if (license.isEmpty()) {
+            mBinding!!.etLicenseNumber.error = "Fill this please !"
             return
         }
-        if (fName.isEmpty()) {
-            mBinding!!.etFirstName.error = "Fill this please !"
+        if (modelNumber.isEmpty()) {
+            mBinding!!.etModelNumber.error = "Fill this please !"
             return
         }
-        if (fName.isEmpty()) {
-            mBinding!!.etFirstName.error = "Fill this please !"
-            return
-        }
+
         updatePreference()
         saveDataToDatabase()
     }
 
     private fun saveDataToDatabase() {
+        pDialog.show()
         val hashMap: HashMap<String, String> = HashMap<String, String>()
         hashMap["name"] = "$fName $lName"
         hashMap["mobile"] = mobile
@@ -171,6 +175,7 @@ class DriverDetailsActivity : AppCompatActivity() {
         hashMap["password"] = password
         databaseRef.child("Drivers").child(userId).setValue(hashMap)
             .addOnSuccessListener {
+                pDialog.cancel()
                 AestheticDialog.Builder(this, DialogStyle.TOASTER, DialogType.SUCCESS)
                     .setTitle("Success")
                     .show()
@@ -196,6 +201,7 @@ class DriverDetailsActivity : AppCompatActivity() {
     }
 
     private fun redirect() {
+        pDialog.cancel()
         startActivity(Intent(this, DriverHomeActivity::class.java))
         finish()
     }
@@ -310,12 +316,15 @@ class DriverDetailsActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        val cubeGrid: Circle = Circle()
-        progressBar.indeterminateDrawable = cubeGrid
+
         val filePath: StorageReference = profilePicRef.child("DriverProfile")
             .child("$userId.jpg")
         if (requestCode == CAMERA) {
-            progressBar.visibility = View.VISIBLE
+            val pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
+            pDialog.progressHelper.barColor = Color.parseColor("#CF7351")
+            pDialog.titleText = "Loading"
+            pDialog.setCancelable(false)
+            pDialog.show()
             data?.extras?.let {
                 val thumbnail: Uri =
                     data.extras!!.get("data") as Uri // Bitmap from camera
@@ -328,7 +337,7 @@ class DriverDetailsActivity : AppCompatActivity() {
                                 OnSuccessListener<Uri> { uri ->
                                     val url = uri.toString()
                                     profileImage = url.toString()
-                                    progressBar.visibility = View.GONE
+                                    pDialog.cancel()
                                     AestheticDialog.Builder(
                                         this@DriverDetailsActivity,
                                         DialogStyle.TOASTER,
@@ -349,7 +358,7 @@ class DriverDetailsActivity : AppCompatActivity() {
                 )
             }
         } else if (requestCode == GALLERY) {
-//            progressBar.visibility = View.VISIBLE
+
             val pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
             pDialog.progressHelper.barColor = Color.parseColor("#CF7351")
             pDialog.titleText = "Loading"
@@ -367,7 +376,6 @@ class DriverDetailsActivity : AppCompatActivity() {
                                 OnSuccessListener<Uri> { uri ->
                                     val url = uri.toString()
                                     profileImage = url.toString()
-//                                    progressBar.visibility = View.GONE
                                     pDialog.cancel()
                                     AestheticDialog.Builder(
                                         this@DriverDetailsActivity,
