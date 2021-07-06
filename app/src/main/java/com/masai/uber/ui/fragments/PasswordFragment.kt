@@ -24,7 +24,6 @@ class PasswordFragment : Fragment() {
 
     private lateinit var userId: String
     private lateinit var password: String
-    private lateinit var mobile: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,44 +44,21 @@ class PasswordFragment : Fragment() {
         userId = mAuth.currentUser?.uid.toString()
         userDatabaseRef = FirebaseDatabase.getInstance().reference
 
-        val bundle = arguments
-        if (bundle != null) {
-            mobile = bundle.getString("mobile").toString()
-        }
-
         binding!!.btnNextPassword.setOnClickListener {
             password = binding!!.etPassword.text.toString()
             if (password.length > 6) {
-                saveIntoFirebase()
+                redirect()
             } else {
                 binding!!.etPassword.error = "password length must be greater than 6"
             }
         }
     }
 
-    private fun saveIntoFirebase() {
-        val hashMap: HashMap<String, String> = HashMap<String, String>()
-        hashMap["userId"] = userId
-        hashMap["mobile"] = mobile
-        hashMap["password"] = password
-        userDatabaseRef.child("Drivers").child(userId).setValue(hashMap)
-            .addOnCompleteListener {
-                AestheticDialog.Builder(requireActivity(), DialogStyle.TOASTER, DialogType.SUCCESS)
-                    .setTitle("Success")
-                    .show()
-
-                redirect()
-            }
-            .addOnFailureListener {
-                AestheticDialog.Builder(requireActivity(), DialogStyle.TOASTER, DialogType.ERROR)
-                    .setTitle("Failed")
-                    .show()
-            }
-
-    }
-
     private fun redirect() {
-        startActivity(Intent(context, DriverDetailsActivity::class.java))
+        startActivity(
+            Intent(context, DriverDetailsActivity::class.java)
+                .putExtra("password", password)
+        )
         activity?.finish()
     }
 

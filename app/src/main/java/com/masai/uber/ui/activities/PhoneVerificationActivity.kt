@@ -139,7 +139,7 @@ class PhoneVerificationActivity : AppCompatActivity() {
             PreferenceHelper.writeStringToPreference(KEY_DRIVER_MOBILE_NUMBER, mobileNumber)
         startActivity(
             Intent(this, LaunchFragmentsActivity::class.java)
-                .putExtra("mobile", mobileNumber)
+
         )
     }
 

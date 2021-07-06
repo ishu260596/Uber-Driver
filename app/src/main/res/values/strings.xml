@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Uber</string>
+    <string name="app_name">Uber-Driver</string>
 
     <string name="enter_your_mobile_number">Enter your mobile number</string>
     <string name="or_connect_with_social">Or connect with social</string>
@@ -37,7 +37,7 @@
     <string name="passanger">I\'m a Passanger</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="rover">Rover</string>
+    <string name="rover">Uber</string>
     <string name="move_with_safety">Move with Safety</string>
     <string name="title_activity_driver_maps">Map</string>
     <string name="title_activity_nav_main">NavMainActivity</string>

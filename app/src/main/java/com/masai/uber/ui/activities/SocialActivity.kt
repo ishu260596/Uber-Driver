@@ -1,9 +1,11 @@
 package com.masai.uber.ui.activities
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.cazaea.sweetalert.SweetAlertDialog
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -40,6 +42,8 @@ class SocialActivity : AppCompatActivity() {
     private lateinit var email: String
     private lateinit var uId: String
 
+    private lateinit var pDialog : SweetAlertDialog
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityNewSocialBinding.inflate(layoutInflater)
@@ -60,9 +64,15 @@ class SocialActivity : AppCompatActivity() {
         userDatabaseRef = FirebaseDatabase.getInstance().reference
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions)
 
+        pDialog = SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
+        pDialog.progressHelper.barColor = Color.parseColor("#CF7351")
+        pDialog.titleText = "Please wait !"
+        pDialog.setCancelable(false)
+
         binding!!.btnGoogle.setOnClickListener {
             val intent: Intent = googleSignInClient.signInIntent
             startActivityForResult(intent, SIGN_IN_CODE)
+            pDialog.show()
         }
     }
 
@@ -107,26 +117,21 @@ class SocialActivity : AppCompatActivity() {
                 PreferenceHelper.writeBooleanToPreference(KEY_LOGIN_WITH_OAUTH, true)
                 Toast.makeText(this, "Welcome ${account.displayName}", Toast.LENGTH_SHORT)
                     .show()
+
                 updatePreference()
-                val intent = Intent(this, DriverHomeActivity::class.java)
-                intent.putExtra("UserName", name)
-                intent.putExtra("UserEmail", email)
-                intent.putExtra("UserPhoto", profileUrl)
-                intent.putExtra("uid", uId)
-                saveUser()
-                startActivity(intent)
-                finish()
+                redirect()
+
             } else {
                 AestheticDialog.Builder(this, DialogStyle.TOASTER, DialogType.ERROR)
                     .setTitle("Failed")
                     .show()
             }
         } catch (e: Exception) {
-
+            e.printStackTrace()
         }
     }
 
-    private fun updatePreference( ) {
+    private fun updatePreference() {
         PreferenceHelper.writeBooleanToPreference(KEY_DRIVER_LOGGED_IN, true)
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_GOOGLE_ID, uId)
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_DISPLAY_NAME, name)
@@ -134,33 +139,10 @@ class SocialActivity : AppCompatActivity() {
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_PROFILE_URL, profileUrl)
     }
 
-    private fun saveUser() {
-        val hashMap: HashMap<String, String> = HashMap<String, String>()
-        hashMap["name"] = name
-        hashMap["email"] =email
-        hashMap["userId"] = userId
-        hashMap["uId"] = uId
-        hashMap["profileUrl"] = profileUrl
-        userDatabaseRef.child("Drivers").child(userId).setValue(hashMap)
-            .addOnCompleteListener {
-                AestheticDialog.Builder(this, DialogStyle.TOASTER, DialogType.SUCCESS)
-                    .setTitle("Completed")
-                    .show()
-
-                redirect()
-            }
-            .addOnFailureListener {
-                AestheticDialog.Builder(this, DialogStyle.TOASTER, DialogType.ERROR)
-                    .setTitle("Failed")
-                    .show()
-            }
-
-    }
-
     private fun redirect() {
-        startActivity(
-            Intent(this, DriverHomeActivity::class.java)
-        )
+        pDialog.cancel()
+        val intent = Intent(this, DriverDetailsActivity::class.java)
+        startActivity(intent)
         finish()
     }
 

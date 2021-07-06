@@ -13,66 +13,67 @@ import androidx.core.app.NotificationCompat
 import com.masai.uber.R
 import com.masai.uber.services.MyFirebaseServices
 
-class Common {
-    companion object {
-        fun showNotification(
-            context: Context,
-            id: Int,
-            title: String?,
-            body: String?,
-            intent: Intent?
-        ) {
+object Common {
+    fun showNotification(
+        context: Context,
+        id: Int,
+        title: String?,
+        body: String?,
+        intent: Intent?
+    ) {
 
-            var pendingIntent: PendingIntent? = null
+        var pendingIntent: PendingIntent? = null
 //
 //            if (intent != null) {
-                pendingIntent = PendingIntent.getActivity(
-                    context,
-                    id, intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT
+        pendingIntent = PendingIntent.getActivity(
+            context,
+            id, intent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val NOTIFICATION_CHANNEL_ID = "ishu.masai.school"
+        val notificationManager: NotificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel: NotificationChannel =
+                NotificationChannel(
+                    NOTIFICATION_CHANNEL_ID,
+                    "Uber", NotificationManager.IMPORTANCE_HIGH
                 )
+            notificationChannel.description = "Hi there"
+            notificationChannel.enableLights(true)
+            notificationChannel.enableVibration(true)
+            notificationChannel.lightColor = Color.YELLOW
 
-                val NOTIFICATION_CHANNEL_ID = "ishu.masai.school"
-                val notificationManager: NotificationManager =
-                    context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(notificationChannel)
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    val notificationChannel: NotificationChannel =
-                        NotificationChannel(
-                            NOTIFICATION_CHANNEL_ID,
-                            "Uber", NotificationManager.IMPORTANCE_HIGH
-                        )
-                    notificationChannel.description = "Hi there"
-                    notificationChannel.enableLights(true)
-                    notificationChannel.enableVibration(true)
-                    notificationChannel.lightColor = Color.YELLOW
+        }
+        val builder: NotificationCompat.Builder = NotificationCompat
+            .Builder(context, NOTIFICATION_CHANNEL_ID)
 
-                    notificationManager.createNotificationChannel(notificationChannel)
+        builder.setContentTitle(title)
+            .setContentText(body)
+            .setAutoCancel(false)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setDefaults(Notification.DEFAULT_VIBRATE)
+            .setSmallIcon(R.drawable.ic_baseline_directions_car)
+            .setLargeIcon(
+                BitmapFactory
+                    .decodeResource(
+                        context.resources,
+                        R.drawable.ic_baseline_directions_car
+                    )
+            )
 
-                }
-                val builder: NotificationCompat.Builder = NotificationCompat
-                    .Builder(context, NOTIFICATION_CHANNEL_ID)
+        if (pendingIntent != null) {
+            builder.setContentIntent(pendingIntent)
+        }
+        val notification = builder.build()
 
-                builder.setContentTitle(title)
-                    .setContentText(body )
-                    .setAutoCancel(false)
-                    .setPriority(NotificationCompat.PRIORITY_HIGH)
-                    .setDefaults(Notification.DEFAULT_VIBRATE)
-                    .setSmallIcon(R.drawable.ic_baseline_directions_car)
-                    .setLargeIcon(
-                        BitmapFactory
-                            .decodeResource(
-                                context.resources,
-                                R.drawable.ic_baseline_directions_car))
-
-                if (pendingIntent != null) {
-                    builder.setContentIntent(pendingIntent)
-                }
-                val notification = builder.build()
-
-                notificationManager.notify(id, notification)
+        notificationManager.notify(id, notification)
 
 //            }
-        }
     }
+
 }

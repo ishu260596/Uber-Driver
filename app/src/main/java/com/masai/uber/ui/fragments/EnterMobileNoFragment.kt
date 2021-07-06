@@ -32,6 +32,7 @@ class FragmentEnterMobileNo : Fragment() {
         binding!!.tvSocialMedia.setOnClickListener {
             startActivity(
                 Intent(requireContext(), SocialActivity::class.java))
+            activity?.finish()
         }
 
         binding!!.btnNext.setOnClickListener {
@@ -40,20 +41,10 @@ class FragmentEnterMobileNo : Fragment() {
                 val intent = Intent(requireContext(), PhoneVerificationActivity::class.java)
                 intent.putExtra("number", binding!!.etMobileNumber.text.toString())
                 startActivity(intent)
+                activity?.finish()
             } else binding!!.etMobileNumber.error = "Please provide a valid mobile number"
         }
     }
-
-    /**   private fun launchActivity(s: String) {
-    val otpFragment = OTPFragment()
-    val bundle = Bundle()
-    bundle.putString("number", mobileNumber)
-    otpFragment.arguments = bundle
-    val transaction: FragmentTransaction = requireFragmentManager().beginTransaction()
-    transaction.replace(R.id.container, otpFragment)
-    transaction.addToBackStack("OTPFragment")
-    transaction.commit()
-    }  **/
 
     override fun onDestroy() {
         super.onDestroy()
