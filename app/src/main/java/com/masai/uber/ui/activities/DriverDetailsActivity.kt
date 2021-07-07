@@ -81,7 +81,6 @@ class DriverDetailsActivity : AppCompatActivity() {
             customImageSelectionDialog()
         }
         mBinding!!.btnNext.setOnClickListener {
-            pDialog.show()
             verifyCredentials()
         }
     }
@@ -156,7 +155,7 @@ class DriverDetailsActivity : AppCompatActivity() {
             mBinding!!.etModelNumber.error = "Fill this please !"
             return
         }
-
+        pDialog.show()
         updatePreference()
         saveDataToDatabase()
     }

@@ -136,7 +136,6 @@ class SocialActivity : AppCompatActivity() {
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_GOOGLE_ID, uId)
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_DISPLAY_NAME, name)
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_GOOGLE_GMAIL, email)
-        PreferenceHelper.writeStringToPreference(KEY_DRIVER_PROFILE_URL, profileUrl)
     }
 
     private fun redirect() {
