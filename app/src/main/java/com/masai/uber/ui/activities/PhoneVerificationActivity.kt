@@ -123,14 +123,14 @@ class PhoneVerificationActivity : AppCompatActivity() {
         mAuth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    AestheticDialog.Builder(this, DialogStyle.TOASTER, DialogType.SUCCESS)
-                        .setTitle("Success")
-                        .show()
+//                    AestheticDialog.Builder(this, DialogStyle.TOASTER, DialogType.SUCCESS)
+//                        .setTitle("Success")
+//                        .show()
                     redirect()
                 } else {
-                    AestheticDialog.Builder(this, DialogStyle.TOASTER, DialogType.ERROR)
-                        .setTitle("Failed")
-                        .show()
+//                    AestheticDialog.Builder(this, DialogStyle.TOASTER, DialogType.ERROR)
+//                        .setTitle("Failed")
+//                        .show()
                 }
             }
     }
