@@ -2,6 +2,8 @@ package com.masai.uber.ui.fragments
 
 import android.content.ActivityNotFoundException
 import android.content.pm.PackageManager
+import android.location.Address
+import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
 import android.os.Looper
@@ -35,6 +37,8 @@ import com.masai.uber.utlis.KEY_DRIVER_LOCATION_REFERENCE
 import com.thecode.aestheticdialogs.AestheticDialog
 import com.thecode.aestheticdialogs.DialogStyle
 import com.thecode.aestheticdialogs.DialogType
+import java.io.IOException
+import java.util.*
 
 
 class DriverHomeFragment : Fragment(), OnMapReadyCallback {
@@ -48,16 +52,16 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mAuth: FirebaseAuth
     private lateinit var onlineRef: DatabaseReference
-    private lateinit var currentUserRef: DatabaseReference
+    private var currentUserRef: DatabaseReference?=null
     private lateinit var driverLocationRef: DatabaseReference
-    private  var geoFire: GeoFire? = null
+    private var geoFire: GeoFire? = null
 
     private lateinit var userId: String
 
     private val valueEventListener: ValueEventListener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
-            if (snapshot.exists()) {
-                currentUserRef.onDisconnect().removeValue()
+            if (snapshot.exists() && currentUserRef != null) {
+                currentUserRef!!.onDisconnect().removeValue()
             }
         }
 
@@ -105,13 +109,14 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
         userId = mAuth.currentUser?.uid.toString()
         onlineRef = FirebaseDatabase.getInstance().reference
             .child(".info/connected")
-        driverLocationRef =
-            FirebaseDatabase.getInstance().getReference(KEY_DRIVER_LOCATION_REFERENCE)
-        currentUserRef = FirebaseDatabase.getInstance().getReference(KEY_DRIVER_LOCATION_REFERENCE)
-            .child(userId)
-        geoFire = GeoFire(driverLocationRef)
+//        driverLocationRef =
+//            FirebaseDatabase.getInstance().getReference(KEY_DRIVER_LOCATION_REFERENCE)
+//
+//                    currentUserRef = FirebaseDatabase.getInstance().getReference(KEY_DRIVER_LOCATION_REFERENCE)
+//                        .child(userId)
+//        geoFire = GeoFire(driverLocationRef)
 
-        registerOnlineSystem()
+//        registerOnlineSystem()
 
         /** Location **/
         mLocationReq = LocationRequest()
@@ -131,24 +136,40 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
                     CameraUpdateFactory
                         .newLatLngZoom(newPosition, 18f)
                 )
+                val geoCoder = Geocoder(requireContext(), Locale.getDefault())
+                val addressList: List<Address>?
 
-                //update location
-                geoFire?.setLocation(
-                    userId, GeoLocation(
+                try {
+                    addressList = geoCoder.getFromLocation(
                         locationResult.lastLocation.latitude,
-                        locationResult.lastLocation.longitude
+                        locationResult.lastLocation.longitude,1
                     )
-                ) { key, error ->
-                    if (error != null) {
-                        AestheticDialog.Builder(
-                            requireActivity(),
-                            DialogStyle.TOASTER,
-                            DialogType.ERROR
+                    val cityName = addressList[0].locality
+                    driverLocationRef =
+                        FirebaseDatabase.getInstance().getReference(KEY_DRIVER_LOCATION_REFERENCE)
+                            .child(cityName)
+                    currentUserRef = driverLocationRef.child(
+                        FirebaseAuth.getInstance()
+                            .currentUser!!.uid
+                    )
+                    geoFire = GeoFire(driverLocationRef)
+                    //update location
+                    geoFire?.setLocation(
+                        userId, GeoLocation(
+                            locationResult.lastLocation.latitude,
+                            locationResult.lastLocation.longitude
                         )
-                            .setTitle("Error ")
-                            .setMessage(error.message.toString())
-                            .show()
-                    } else {
+                    ) { key, error ->
+                        if (error != null) {
+                            AestheticDialog.Builder(
+                                requireActivity(),
+                                DialogStyle.TOASTER,
+                                DialogType.ERROR
+                            )
+                                .setTitle("Error ")
+                                .setMessage(error.message.toString())
+                                .show()
+                        } else {
 //                        AestheticDialog.Builder(
 //                            requireActivity(),
 //                            DialogStyle.TOASTER,
@@ -157,8 +178,41 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
 //                            .setTitle("Success ")
 //                            .setMessage("You are online")
 //                            .show()
+                        }
                     }
+                    registerOnlineSystem()
+                } catch (e: IOException) {
+                    Snackbar.make(requireView(), e.message!!, Snackbar.LENGTH_SHORT).show()
+
                 }
+
+//                //update location
+//                geoFire?.setLocation(
+//                    userId, GeoLocation(
+//                        locationResult.lastLocation.latitude,
+//                        locationResult.lastLocation.longitude
+//                    )
+//                ) { key, error ->
+//                    if (error != null) {
+//                        AestheticDialog.Builder(
+//                            requireActivity(),
+//                            DialogStyle.TOASTER,
+//                            DialogType.ERROR
+//                        )
+//                            .setTitle("Error ")
+//                            .setMessage(error.message.toString())
+//                            .show()
+//                    } else {
+////                        AestheticDialog.Builder(
+////                            requireActivity(),
+////                            DialogStyle.TOASTER,
+////                            DialogType.SUCCESS
+////                        )
+////                            .setTitle("Success ")
+////                            .setMessage("You are online")
+////                            .show()
+//                    }
+//                }
             }
 
         }
@@ -225,50 +279,50 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
                     }
 
                     /**mMap!!.setOnMyLocationButtonClickListener(
-                        object : GoogleMap.OnMyLocationButtonClickListener {
-                            override fun onMyLocationButtonClick(): Boolean {
-                                if (ActivityCompat.checkSelfPermission(
-                                        requireContext(),
-                                        android.Manifest.permission.ACCESS_FINE_LOCATION
-                                    ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                                        requireContext(),
-                                        android.Manifest.permission.ACCESS_COARSE_LOCATION
-                                    ) != PackageManager.PERMISSION_GRANTED
-                                ) {
-                                    return false
-                                }
-                                mFusedLocationClient.lastLocation
-                                    .addOnFailureListener {
-//                                        AestheticDialog.Builder(
-//                                            requireActivity(),
-//                                            DialogStyle.TOASTER,
-//                                            DialogType.SUCCESS
-//                                        )
-//                                            .setTitle("${it.message}")
-//                                            .show()
-                                    }
-                                    .addOnSuccessListener {
-                                        val userLatLng = LatLng(
-                                            it.latitude,
-                                            it.longitude
-                                        )
+                    object : GoogleMap.OnMyLocationButtonClickListener {
+                    override fun onMyLocationButtonClick(): Boolean {
+                    if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    android.Manifest.permission.ACCESS_FINE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                    return false
+                    }
+                    mFusedLocationClient.lastLocation
+                    .addOnFailureListener {
+                    //                                        AestheticDialog.Builder(
+                    //                                            requireActivity(),
+                    //                                            DialogStyle.TOASTER,
+                    //                                            DialogType.SUCCESS
+                    //                                        )
+                    //                                            .setTitle("${it.message}")
+                    //                                            .show()
+                    }
+                    .addOnSuccessListener {
+                    val userLatLng = LatLng(
+                    it.latitude,
+                    it.longitude
+                    )
 
-                                        mCurrentLocation = it
-                                        googleMap.animateCamera(
-                                            CameraUpdateFactory
-                                                .newLatLngZoom(userLatLng, 18f)
-                                        )
-                                    }
+                    mCurrentLocation = it
+                    googleMap.animateCamera(
+                    CameraUpdateFactory
+                    .newLatLngZoom(userLatLng, 18f)
+                    )
+                    }
 
-                                return true
-                            }
-                        })**/
+                    return true
+                    }
+                    })**/
 
                     //set location button
-                   /** val locationButton =
-                        (mapFragment.view?.findViewById<View>(Integer.parseInt("1"))?.parent as View).findViewById<View>(
-                            Integer.parseInt("2")
-                        )**/
+                    /** val locationButton =
+                    (mapFragment.view?.findViewById<View>(Integer.parseInt("1"))?.parent as View).findViewById<View>(
+                    Integer.parseInt("2")
+                    )**/
 
                     val locationButton = (mapFragment.requireView()!!
                         .findViewById<View>("1".toInt())!!.parent!! as View)
@@ -279,7 +333,7 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
                     params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
                     params.bottomMargin = 50
 
-                  /** val rlp = locationButton.layoutParams as RelativeLayout.LayoutParams
+                    /** val rlp = locationButton.layoutParams as RelativeLayout.LayoutParams
                     rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
                     rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
                     rlp.setMargins(0, 0, 0, 50)**/
