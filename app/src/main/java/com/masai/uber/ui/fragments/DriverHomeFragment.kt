@@ -20,6 +20,7 @@ import com.google.android.gms.location.*
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.karumi.dexter.Dexter
@@ -31,7 +32,6 @@ import com.karumi.dexter.listener.single.PermissionListener
 import com.masai.uber.R
 import com.masai.uber.databinding.FragmentDriverHomeBinding
 import com.masai.uber.utlis.KEY_DRIVER_LOCATION_REFERENCE
-import com.masai.uber.utlis.MAP_VIEW_BUNDLE_KEY
 import com.thecode.aestheticdialogs.AestheticDialog
 import com.thecode.aestheticdialogs.DialogStyle
 import com.thecode.aestheticdialogs.DialogType
@@ -95,11 +95,11 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val mapViewBundle = savedInstanceState?.getBundle(MAP_VIEW_BUNDLE_KEY)
         initViews()
     }
 
     private fun initViews() {
+
         /** Firebase and GeoFire **/
         mAuth = FirebaseAuth.getInstance()
         userId = mAuth.currentUser?.uid.toString()
@@ -113,11 +113,12 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
 
         registerOnlineSystem()
 
+        /** Location **/
         mLocationReq = LocationRequest()
+        mLocationReq.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         mLocationReq.smallestDisplacement = 10f
         mLocationReq.interval = 5000
         mLocationReq.fastestInterval = 3000
-        mLocationReq.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 
         mLocationCallback = object : com.google.android.gms.location.LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
@@ -148,20 +149,19 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
                             .setMessage(error.message.toString())
                             .show()
                     } else {
-                        AestheticDialog.Builder(
-                            requireActivity(),
-                            DialogStyle.TOASTER,
-                            DialogType.SUCCESS
-                        )
-                            .setTitle("Success ")
-                            .setMessage("You are online")
-                            .show()
+//                        AestheticDialog.Builder(
+//                            requireActivity(),
+//                            DialogStyle.TOASTER,
+//                            DialogType.SUCCESS
+//                        )
+//                            .setTitle("Success ")
+//                            .setMessage("You are online")
+//                            .show()
                     }
                 }
             }
 
         }
-
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
@@ -178,12 +178,12 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
         mFusedLocationClient.requestLocationUpdates(
             mLocationReq,
             mLocationCallback,
-            Looper.myLooper()
+            Looper.myLooper()!!
         )
     }
 
-    override fun onMapReady(mMap: GoogleMap) {
-        this.mMap = mMap
+    override fun onMapReady(googleMap: GoogleMap) {
+        this.mMap = googleMap
         Dexter.withContext(context)
             .withPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)
             .withListener(object : PermissionListener {
@@ -198,23 +198,33 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
                     ) {
                         return
                     }
-                    mMap.isMyLocationEnabled = true
-                    try {
-                        val success = mMap.setMapStyle(
-                            MapStyleOptions.loadRawResourceStyle(
-                                context,
-                                R.raw.uber_maps_style
-                            )
-                        )
-                        if (!success) {
-                            Log.d("tag", "error")
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        Log.d("tag", "error")
+
+
+                    mMap!!.isMyLocationEnabled = true
+                    mMap!!.uiSettings.isMyLocationButtonEnabled = true
+                    mMap!!.setOnMyLocationButtonClickListener {
+                        mFusedLocationClient.lastLocation
+                            .addOnFailureListener { e ->
+                                Snackbar.make(
+                                    requireView(), e.message!!,
+                                    Snackbar.LENGTH_LONG
+                                ).show()
+                            }
+                            .addOnSuccessListener { location ->
+                                val userLating = LatLng(location.latitude, location.longitude)
+                                mMap!!.animateCamera(
+                                    CameraUpdateFactory.newLatLngZoom(
+                                        userLating,
+                                        10f
+                                    )
+                                )
+
+                            }
+
+                        true
                     }
-                    mMap.uiSettings.isMyLocationButtonEnabled = true
-                    mMap.setOnMyLocationButtonClickListener(
+
+                    /**mMap!!.setOnMyLocationButtonClickListener(
                         object : GoogleMap.OnMyLocationButtonClickListener {
                             override fun onMyLocationButtonClick(): Boolean {
                                 if (ActivityCompat.checkSelfPermission(
@@ -229,13 +239,13 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
                                 }
                                 mFusedLocationClient.lastLocation
                                     .addOnFailureListener {
-                                        AestheticDialog.Builder(
-                                            requireActivity(),
-                                            DialogStyle.TOASTER,
-                                            DialogType.SUCCESS
-                                        )
-                                            .setTitle("${it.message}")
-                                            .show()
+//                                        AestheticDialog.Builder(
+//                                            requireActivity(),
+//                                            DialogStyle.TOASTER,
+//                                            DialogType.SUCCESS
+//                                        )
+//                                            .setTitle("${it.message}")
+//                                            .show()
                                     }
                                     .addOnSuccessListener {
                                         val userLatLng = LatLng(
@@ -244,7 +254,7 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
                                         )
 
                                         mCurrentLocation = it
-                                        mMap.animateCamera(
+                                        googleMap.animateCamera(
                                             CameraUpdateFactory
                                                 .newLatLngZoom(userLatLng, 18f)
                                         )
@@ -252,17 +262,27 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
 
                                 return true
                             }
-                        })
+                        })**/
 
                     //set location button
-                    val locationButton =
+                   /** val locationButton =
                         (mapFragment.view?.findViewById<View>(Integer.parseInt("1"))?.parent as View).findViewById<View>(
                             Integer.parseInt("2")
-                        )
-                    val rlp = locationButton.layoutParams as RelativeLayout.LayoutParams
+                        )**/
+
+                    val locationButton = (mapFragment.requireView()!!
+                        .findViewById<View>("1".toInt())!!.parent!! as View)
+                        .findViewById<View>("2".toInt())
+
+                    val params = locationButton.layoutParams as RelativeLayout.LayoutParams
+                    params.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
+                    params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
+                    params.bottomMargin = 50
+
+                  /** val rlp = locationButton.layoutParams as RelativeLayout.LayoutParams
                     rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
                     rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
-                    rlp.setMargins(0, 0, 0, 50)
+                    rlp.setMargins(0, 0, 0, 50)**/
                 }
 
                 override fun onPermissionDenied(p0: PermissionDeniedResponse?) {
@@ -285,6 +305,22 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
 
             }).onSameThread()
             .check()
+
+        try {
+            val success = mMap!!.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                    context,
+                    R.raw.uber_maps_style
+                )
+            )
+            if (!success) {
+                Log.d("tag", "error")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.d("tag", "error")
+        }
+
     }
 
     private fun showRationalDialogForPermissions() {

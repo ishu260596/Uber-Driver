@@ -115,16 +115,15 @@ class SocialActivity : AppCompatActivity() {
                 uId = account.id.toString()
                 profileUrl = account.photoUrl.toString()
                 PreferenceHelper.writeBooleanToPreference(KEY_LOGIN_WITH_OAUTH, true)
-                Toast.makeText(this, "Welcome ${account.displayName}", Toast.LENGTH_SHORT)
-                    .show()
-
+//                Toast.makeText(this, "Welcome ${account.displayName}", Toast.LENGTH_SHORT)
+//                    .show()
                 updatePreference()
                 redirect()
 
             } else {
-                AestheticDialog.Builder(this, DialogStyle.TOASTER, DialogType.ERROR)
-                    .setTitle("Failed")
-                    .show()
+//                AestheticDialog.Builder(this, DialogStyle.TOASTER, DialogType.ERROR)
+//                    .setTitle("Failed")
+//                    .show()
             }
         } catch (e: Exception) {
             e.printStackTrace()
