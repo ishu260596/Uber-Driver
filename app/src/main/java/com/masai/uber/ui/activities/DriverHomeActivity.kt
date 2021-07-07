@@ -86,7 +86,7 @@ class DriverHomeActivity : AppCompatActivity() {
         val tvRating = view.findViewById<TextView>(R.id.tvRating)
         val name = PreferenceHelper.getStringFromPreference(KEY_DRIVER_DISPLAY_NAME).toString()
         val url = PreferenceHelper.getStringFromPreference(KEY_DRIVER_PROFILE_URL).toString()
-        Log.d("tag", url)
+        Log.d("tag", "$url Home")
         Log.d("tag", name)
         tvName.text = name
 

@@ -197,6 +197,7 @@ class DriverDetailsActivity : AppCompatActivity() {
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_GOOGLE_GMAIL, email)
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_TAXI_NUMBER, taxiNumber)
         PreferenceHelper.writeStringToPreference(KEY_DRIVER_PROFILE_URL, profileImage)
+        Log.d("tag", profileImage)
     }
 
     private fun redirect() {
