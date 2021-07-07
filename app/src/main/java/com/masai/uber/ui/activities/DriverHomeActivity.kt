@@ -90,8 +90,7 @@ class DriverHomeActivity : AppCompatActivity() {
         Log.d("tag", name)
         tvName.text = name
 
-        Glide.with(ivImage).load(url).placeholder(R.drawable.ic_user_1)
-            .into(ivImage)
+        Glide.with(ivImage).load(url).placeholder(R.drawable.ic_user_1).into(ivImage)
     }
 
     private fun redirect() {
@@ -100,7 +99,6 @@ class DriverHomeActivity : AppCompatActivity() {
             SplashScreenActivity::class.java
         )
         startActivity(intent)
-        finish()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -50,7 +50,7 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
     private lateinit var onlineRef: DatabaseReference
     private lateinit var currentUserRef: DatabaseReference
     private lateinit var driverLocationRef: DatabaseReference
-    private lateinit var geoFire: GeoFire
+    private  var geoFire: GeoFire? = null
 
     private lateinit var userId: String
 
@@ -105,7 +105,8 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
         userId = mAuth.currentUser?.uid.toString()
         onlineRef = FirebaseDatabase.getInstance().reference
             .child(".info/connected")
-        driverLocationRef = FirebaseDatabase.getInstance().getReference(KEY_DRIVER_LOCATION_REFERENCE)
+        driverLocationRef =
+            FirebaseDatabase.getInstance().getReference(KEY_DRIVER_LOCATION_REFERENCE)
         currentUserRef = FirebaseDatabase.getInstance().getReference(KEY_DRIVER_LOCATION_REFERENCE)
             .child(userId)
         geoFire = GeoFire(driverLocationRef)
@@ -131,9 +132,12 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
                 )
 
                 //update location
-                geoFire.setLocation(userId, GeoLocation(
+                geoFire?.setLocation(
+                    userId, GeoLocation(
                         locationResult.lastLocation.latitude,
-                        locationResult.lastLocation.longitude)) { key, error ->
+                        locationResult.lastLocation.longitude
+                    )
+                ) { key, error ->
                     if (error != null) {
                         AestheticDialog.Builder(
                             requireActivity(),
@@ -174,7 +178,8 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
         mFusedLocationClient.requestLocationUpdates(
             mLocationReq,
             mLocationCallback,
-            Looper.myLooper())
+            Looper.myLooper()
+        )
     }
 
     override fun onMapReady(mMap: GoogleMap) {
@@ -313,7 +318,7 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
 
     override fun onDestroy() {
         mFusedLocationClient.removeLocationUpdates(mLocationCallback)
-        geoFire.removeLocation(FirebaseAuth.getInstance().currentUser?.uid)
+        geoFire?.removeLocation(FirebaseAuth.getInstance().currentUser?.uid)
         onlineRef.removeEventListener(valueEventListener)
         super.onDestroy()
         binding = null
