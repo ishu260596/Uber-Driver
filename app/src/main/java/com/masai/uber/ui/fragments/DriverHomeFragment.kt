@@ -52,7 +52,7 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mAuth: FirebaseAuth
     private lateinit var onlineRef: DatabaseReference
-    private lateinit var currentUserRef: DatabaseReference
+    private var currentUserRef: DatabaseReference?=null
     private lateinit var driverLocationRef: DatabaseReference
     private var geoFire: GeoFire? = null
 
@@ -60,8 +60,8 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
 
     private val valueEventListener: ValueEventListener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
-            if (snapshot.exists()) {
-                currentUserRef.onDisconnect().removeValue()
+            if (snapshot.exists() && currentUserRef != null) {
+                currentUserRef!!.onDisconnect().removeValue()
             }
         }
 
@@ -109,42 +109,14 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
         userId = mAuth.currentUser?.uid.toString()
         onlineRef = FirebaseDatabase.getInstance().reference
             .child(".info/connected")
+//        driverLocationRef =
+//            FirebaseDatabase.getInstance().getReference(KEY_DRIVER_LOCATION_REFERENCE)
+//
+//                    currentUserRef = FirebaseDatabase.getInstance().getReference(KEY_DRIVER_LOCATION_REFERENCE)
+//                        .child(userId)
+//        geoFire = GeoFire(driverLocationRef)
 
-        mFusedLocationClient.lastLocation
-            .addOnFailureListener {
-
-            }.addOnSuccessListener {
-                val geoCodes = Geocoder(context, Locale.getDefault())
-                var addressList: List<Address>? = mutableListOf()
-
-                try {
-                    addressList = geoCodes.getFromLocation(
-                        it.latitude,
-                        it.longitude,
-                        1
-                    )
-                    val city = addressList[0].locality
-
-                    driverLocationRef =
-                        FirebaseDatabase.getInstance().getReference(KEY_DRIVER_LOCATION_REFERENCE)
-                            .child(city)
-                    currentUserRef = driverLocationRef.child(userId)
-                        .child(userId)
-
-                    geoFire = GeoFire(driverLocationRef)
-
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
-            }
-
-        /** driverLocationRef =
-        FirebaseDatabase.getInstance().getReference(KEY_DRIVER_LOCATION_REFERENCE)
-        currentUserRef = FirebaseDatabase.getInstance().getReference(KEY_DRIVER_LOCATION_REFERENCE)
-        .child(userId)
-        geoFire = GeoFire(driverLocationRef) **/
-
-        registerOnlineSystem()
+//        registerOnlineSystem()
 
         /** Location **/
         mLocationReq = LocationRequest()
@@ -164,18 +136,23 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
                     CameraUpdateFactory
                         .newLatLngZoom(newPosition, 18f)
                 )
-
-                val geoCodes = Geocoder(context, Locale.getDefault())
-                var addressList: List<Address>? = mutableListOf()
+                val geoCoder = Geocoder(requireContext(), Locale.getDefault())
+                val addressList: List<Address>?
 
                 try {
-                    addressList = geoCodes.getFromLocation(
+                    addressList = geoCoder.getFromLocation(
                         locationResult.lastLocation.latitude,
-                        locationResult.lastLocation.longitude,
-                        1
+                        locationResult.lastLocation.longitude,1
                     )
-                    val city = addressList[0].locality
-
+                    val cityName = addressList[0].locality
+                    driverLocationRef =
+                        FirebaseDatabase.getInstance().getReference(KEY_DRIVER_LOCATION_REFERENCE)
+                            .child("Hamirpur")
+                    currentUserRef = driverLocationRef.child(
+                        FirebaseAuth.getInstance()
+                            .currentUser!!.uid
+                    )
+                    geoFire = GeoFire(driverLocationRef)
                     //update location
                     geoFire?.setLocation(
                         userId, GeoLocation(
@@ -192,25 +169,53 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
                                 .setTitle("Error ")
                                 .setMessage(error.message.toString())
                                 .show()
+                        } else {
+//                        AestheticDialog.Builder(
+//                            requireActivity(),
+//                            DialogStyle.TOASTER,
+//                            DialogType.SUCCESS
+//                        )
+//                            .setTitle("Success ")
+//                            .setMessage("You are online")
+//                            .show()
                         }
                     }
-
-                    driverLocationRef =
-                        FirebaseDatabase.getInstance().getReference(KEY_DRIVER_LOCATION_REFERENCE)
-                            .child(city)
-                    currentUserRef = driverLocationRef.child(userId)
-                        .child(userId)
-
-                    geoFire = GeoFire(driverLocationRef)
-
+                    registerOnlineSystem()
                 } catch (e: IOException) {
-                    e.printStackTrace()
+                    Snackbar.make(requireView(), e.message!!, Snackbar.LENGTH_SHORT).show()
+
                 }
 
+//                //update location
+//                geoFire?.setLocation(
+//                    userId, GeoLocation(
+//                        locationResult.lastLocation.latitude,
+//                        locationResult.lastLocation.longitude
+//                    )
+//                ) { key, error ->
+//                    if (error != null) {
+//                        AestheticDialog.Builder(
+//                            requireActivity(),
+//                            DialogStyle.TOASTER,
+//                            DialogType.ERROR
+//                        )
+//                            .setTitle("Error ")
+//                            .setMessage(error.message.toString())
+//                            .show()
+//                    } else {
+////                        AestheticDialog.Builder(
+////                            requireActivity(),
+////                            DialogStyle.TOASTER,
+////                            DialogType.SUCCESS
+////                        )
+////                            .setTitle("Success ")
+////                            .setMessage("You are online")
+////                            .show()
+//                    }
+//                }
             }
 
         }
-
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
@@ -248,6 +253,7 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
                         return
                     }
 
+
                     mMap!!.isMyLocationEnabled = true
                     mMap!!.uiSettings.isMyLocationButtonEnabled = true
                     mMap!!.setOnMyLocationButtonClickListener {
@@ -271,6 +277,46 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
 
                         true
                     }
+
+                    /**mMap!!.setOnMyLocationButtonClickListener(
+                    object : GoogleMap.OnMyLocationButtonClickListener {
+                    override fun onMyLocationButtonClick(): Boolean {
+                    if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    android.Manifest.permission.ACCESS_FINE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                    return false
+                    }
+                    mFusedLocationClient.lastLocation
+                    .addOnFailureListener {
+                    //                                        AestheticDialog.Builder(
+                    //                                            requireActivity(),
+                    //                                            DialogStyle.TOASTER,
+                    //                                            DialogType.SUCCESS
+                    //                                        )
+                    //                                            .setTitle("${it.message}")
+                    //                                            .show()
+                    }
+                    .addOnSuccessListener {
+                    val userLatLng = LatLng(
+                    it.latitude,
+                    it.longitude
+                    )
+
+                    mCurrentLocation = it
+                    googleMap.animateCamera(
+                    CameraUpdateFactory
+                    .newLatLngZoom(userLatLng, 18f)
+                    )
+                    }
+
+                    return true
+                    }
+                    })**/
 
                     //set location button
                     /** val locationButton =
