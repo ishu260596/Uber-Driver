@@ -61,7 +61,7 @@
         android:fontFamily="@font/roboto_light"
         android:paddingTop="@dimen/_5sdp"
         android:paddingBottom="@dimen/_5sdp"
-        android:text="4.5"
+        android:text="@string/_4_5"
         android:textSize="@dimen/_18sdp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

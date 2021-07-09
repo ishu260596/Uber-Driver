@@ -1,5 +1,6 @@
 package com.masai.uber.ui.fragments
 
+import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.pm.PackageManager
 import android.location.Address
@@ -22,6 +23,8 @@ import com.google.android.gms.location.*
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.android.gms.maps.model.Polyline
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -33,30 +36,51 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import com.masai.uber.R
 import com.masai.uber.databinding.FragmentDriverHomeBinding
+import com.masai.uber.model.eventbus.DriverRequestReceived
+import com.masai.uber.remote.IGoogleApi
 import com.masai.uber.utlis.KEY_DRIVER_LOCATION_REFERENCE
 import com.thecode.aestheticdialogs.AestheticDialog
 import com.thecode.aestheticdialogs.DialogStyle
 import com.thecode.aestheticdialogs.DialogType
+import io.reactivex.disposables.CompositeDisposable
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import java.io.IOException
+import java.lang.StringBuilder
 import java.util.*
 
 
 class DriverHomeFragment : Fragment(), OnMapReadyCallback {
     private var binding: FragmentDriverHomeBinding? = null
 
+    //location
     private var mMap: GoogleMap? = null
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private lateinit var mLocationCallback: com.google.android.gms.location.LocationCallback
     private lateinit var mLocationReq: LocationRequest
     private lateinit var mCurrentLocation: Location
 
+    //firebase
     private lateinit var mAuth: FirebaseAuth
     private lateinit var onlineRef: DatabaseReference
-    private var currentUserRef: DatabaseReference?=null
+    private var currentUserRef: DatabaseReference? = null
     private lateinit var driverLocationRef: DatabaseReference
     private var geoFire: GeoFire? = null
 
     private lateinit var userId: String
+
+    //Routes
+    private val compositeDisposable = CompositeDisposable()
+    private var iGoogleApi: IGoogleApi? = null
+    private var blackPolylineOptions: PolylineOptions? = null
+    private var greyPolylineOptions: PolylineOptions? = null
+    private var blackPolyline: Polyline? = null
+    private var greyPolyline: Polyline? = null
+    private var polyLineList = mutableListOf<Polyline>()
+
+
+    private lateinit var mapFragment: SupportMapFragment
 
     private val valueEventListener: ValueEventListener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
@@ -78,7 +102,6 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
 
     }
 
-    private lateinit var mapFragment: SupportMapFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -142,16 +165,28 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
                 try {
                     addressList = geoCoder.getFromLocation(
                         locationResult.lastLocation.latitude,
-                        locationResult.lastLocation.longitude,1
+                        locationResult.lastLocation.longitude, 1
                     )
                     val cityName = addressList[0].locality
-                    driverLocationRef =
-                        FirebaseDatabase.getInstance().getReference(KEY_DRIVER_LOCATION_REFERENCE)
-                            .child("Hamirpur")
-                    currentUserRef = driverLocationRef.child(
-                        FirebaseAuth.getInstance()
-                            .currentUser!!.uid
-                    )
+                    if (cityName != null) {
+                        driverLocationRef =
+                            FirebaseDatabase.getInstance()
+                                .getReference(KEY_DRIVER_LOCATION_REFERENCE)
+                                .child(cityName)
+                        currentUserRef = driverLocationRef.child(
+                            FirebaseAuth.getInstance()
+                                .currentUser!!.uid
+                        )
+                    } else {
+                        driverLocationRef =
+                            FirebaseDatabase.getInstance()
+                                .getReference(KEY_DRIVER_LOCATION_REFERENCE)
+                                .child("Hamirpur")
+                        currentUserRef = driverLocationRef.child(
+                            FirebaseAuth.getInstance()
+                                .currentUser!!.uid
+                        )
+                    }
                     geoFire = GeoFire(driverLocationRef)
                     //update location
                     geoFire?.setLocation(
@@ -401,6 +436,11 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
         onlineRef.addValueEventListener(valueEventListener)
     }
 
+    override fun onStart() {
+        super.onStart()
+        EventBus.getDefault().register(this)
+    }
+
     override fun onResume() {
         super.onResume()
         registerOnlineSystem()
@@ -410,8 +450,46 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
         mFusedLocationClient.removeLocationUpdates(mLocationCallback)
         geoFire?.removeLocation(FirebaseAuth.getInstance().currentUser?.uid)
         onlineRef.removeEventListener(valueEventListener)
+        if (EventBus.getDefault().hasSubscriberForEvent(DriverRequestReceived::class.java))
+            EventBus.getDefault().removeStickyEvent(DriverRequestReceived::class.java)
+        EventBus.getDefault().unregister(this)
+
+        compositeDisposable.clear()
+
         super.onDestroy()
         binding = null
     }
 
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public fun onDriverRequestReceive(event: DriverRequestReceived) {
+
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+
+            return
+        }
+        mFusedLocationClient.lastLocation
+            .addOnFailureListener {
+
+            }
+       /**    .addOnSuccessListener {
+                val locationStr= StringBuilder()
+                    .append(it.latitude)
+                    .append(",")
+                    .append(it.longitude)
+
+                compositeDisposable.add(iGoogleApi.getDirections("driving",
+                    "less_driving",
+                    locationStr.toString(),
+                    event.pickUpLocation,
+
+                ))
+            } **/
+    }
 }

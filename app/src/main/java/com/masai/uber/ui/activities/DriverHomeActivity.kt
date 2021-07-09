@@ -38,6 +38,9 @@ class DriverHomeActivity : AppCompatActivity() {
     private lateinit var navView: NavigationView
     private lateinit var navController: NavController
 
+    private lateinit var ivImage: CircleImageView
+    private lateinit var url: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -82,10 +85,10 @@ class DriverHomeActivity : AppCompatActivity() {
         //setData
         val view: View = navView.getHeaderView(0)
         val tvName = view.findViewById<TextView>(R.id.tvNameHeader)
-        val ivImage = view.findViewById<CircleImageView>(R.id.profile_image_header)
+        ivImage = view.findViewById<CircleImageView>(R.id.profile_image_header)
         val tvRating = view.findViewById<TextView>(R.id.tvRating)
         val name = PreferenceHelper.getStringFromPreference(KEY_DRIVER_DISPLAY_NAME).toString()
-        val url = PreferenceHelper.getStringFromPreference(KEY_DRIVER_PROFILE_URL).toString()
+        url = PreferenceHelper.getStringFromPreference(KEY_DRIVER_PROFILE_URL).toString()
         Log.d("tag", "$url Home")
         Log.d("tag", name)
         tvName.text = name
@@ -99,6 +102,11 @@ class DriverHomeActivity : AppCompatActivity() {
             SplashScreenActivity::class.java
         )
         startActivity(intent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Glide.with(ivImage).load(url).placeholder(R.drawable.ic_user_1).into(ivImage)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

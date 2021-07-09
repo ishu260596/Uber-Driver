@@ -99,4 +99,14 @@ dependencies {
     implementation 'com.firebase:geofire-android:3.1.0'
     //sweet alert dialog
     implementation 'com.github.cazaea:sweet-alert-dialog:1.0.0'
+    // Retrofit & OkHttp
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.6.1'
+    implementation 'com.squareup.retrofit2:converter-scalars:2.6.1'
+    implementation  'com.squareup.retrofit2:converter-gson:2.9.0'
+    //eventbus
+    implementation 'org.greenrobot:eventbus:3.2.0'
+    //Circular Progress bar
+    implementation 'com.mikhaellopez:circularprogressbar:3.1.0'
+    //rxjava
+    implementation "io.reactivex.rxjava3:rxjava:3.0.13"
 }

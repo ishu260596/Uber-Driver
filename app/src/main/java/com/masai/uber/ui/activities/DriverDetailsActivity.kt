@@ -62,7 +62,7 @@ class DriverDetailsActivity : AppCompatActivity() {
     private lateinit var taxiNumber: String
     private lateinit var modelNumber: String
     private lateinit var license: String
-    private var password: String = ""
+    private var password: String = "abcdeghijk"
 
     private lateinit var pDialog: SweetAlertDialog
 
