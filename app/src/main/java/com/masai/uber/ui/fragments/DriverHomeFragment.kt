@@ -144,9 +144,9 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
         /** Location **/
         mLocationReq = LocationRequest()
         mLocationReq.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-        mLocationReq.smallestDisplacement = 10f
-        mLocationReq.interval = 5000
-        mLocationReq.fastestInterval = 3000
+        mLocationReq.smallestDisplacement = 50f //50m
+        mLocationReq.interval = 15000 //15 sec
+        mLocationReq.fastestInterval = 10000 //10 sec
 
         mLocationCallback = object : com.google.android.gms.location.LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
@@ -437,8 +437,8 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onStart() {
-        super.onStart()
         EventBus.getDefault().register(this)
+        super.onStart()
     }
 
     override fun onResume() {
