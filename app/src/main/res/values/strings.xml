@@ -71,5 +71,8 @@
     <string name="help">Help</string>
     <string name="your_trips">Your Trips</string>
     <string name="wallet">Wallet</string>
+    <string name="decline">Decline</string>
+    <string name="uber">Uber</string>
+    <string name="_4_5">4.5</string>
 
 </resources>

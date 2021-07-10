@@ -15,39 +15,16 @@ import com.thecode.aestheticdialogs.DialogType
 
 class GetStartedActivity : AppCompatActivity() {
     private var binding: ActivityGetStartedBinding? = null
-    private lateinit var mAuth: FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityGetStartedBinding.inflate(layoutInflater)
         val view = binding!!.root
         setContentView(view)
-        mAuth = FirebaseAuth.getInstance()
-
-        val user = mAuth.currentUser
-        if (user != null) {
-            FirebaseMessaging.getInstance().token
-                .addOnCompleteListener(OnCompleteListener { task ->
-                    if (!task.isSuccessful) {
-                        AestheticDialog.Builder(this, DialogStyle.TOASTER, DialogType.ERROR)
-                            .setTitle("Failed")
-                            .show()
-                        return@OnCompleteListener
-                    }
-                    // Get new FCM registration token
-                    val token = task.result
-                    Log.d("Token", token.toString())
-                    UserUtils.updateToken(this, token)
-                })
-        }
 
         binding!!.btnGetStarted.setOnClickListener {
-            if (mAuth.currentUser != null) {
-                startActivity(Intent(this, DriverHomeActivity::class.java))
-                finish()
-            } else {
-                startActivity(Intent(this, MainActivity::class.java))
-                finish()
-            }
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
         }
     }
 
