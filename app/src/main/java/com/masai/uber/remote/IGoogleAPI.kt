@@ -6,7 +6,7 @@ import retrofit2.http.Query
 
 
 public interface IGoogleApi {
-    @GET("maps/api.direction/json")
+    @GET("maps/api/direction/json")
     fun getDirections(
         @Query("mode") mode: String?,
         @Query("transit_routing_preference") transit_routing: String?,
