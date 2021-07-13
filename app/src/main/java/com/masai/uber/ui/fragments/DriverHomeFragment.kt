@@ -1,17 +1,19 @@
 package com.masai.uber.ui.fragments
 
 import android.Manifest
+import android.animation.ValueAnimator
 import android.content.ActivityNotFoundException
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
-import android.location.Location
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -21,10 +23,7 @@ import com.firebase.geofire.GeoFire
 import com.firebase.geofire.GeoLocation
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.Polyline
-import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.*
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -38,17 +37,25 @@ import com.masai.uber.R
 import com.masai.uber.databinding.FragmentDriverHomeBinding
 import com.masai.uber.model.eventbus.DriverRequestReceived
 import com.masai.uber.remote.IGoogleApi
+import com.masai.uber.remote.RetrofitClient
+import com.masai.uber.utlis.Common
 import com.masai.uber.utlis.KEY_DRIVER_LOCATION_REFERENCE
 import com.thecode.aestheticdialogs.AestheticDialog
 import com.thecode.aestheticdialogs.DialogStyle
 import com.thecode.aestheticdialogs.DialogType
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.fragment_driver_home.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import org.json.JSONObject
 import java.io.IOException
 import java.lang.StringBuilder
 import java.util.*
+import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 
 class DriverHomeFragment : Fragment(), OnMapReadyCallback {
@@ -59,7 +66,6 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private lateinit var mLocationCallback: com.google.android.gms.location.LocationCallback
     private lateinit var mLocationReq: LocationRequest
-    private lateinit var mCurrentLocation: Location
 
     //firebase
     private lateinit var mAuth: FirebaseAuth
@@ -74,10 +80,10 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
     private val compositeDisposable = CompositeDisposable()
     private var iGoogleApi: IGoogleApi? = null
     private var blackPolylineOptions: PolylineOptions? = null
-    private var greyPolylineOptions: PolylineOptions? = null
+    private var polylineOptions: PolylineOptions? = null
     private var blackPolyline: Polyline? = null
     private var greyPolyline: Polyline? = null
-    private var polyLineList = mutableListOf<Polyline>()
+    private var polylineList: ArrayList<LatLng?>? = null
 
 
     private lateinit var mapFragment: SupportMapFragment
@@ -105,7 +111,6 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
     override fun onCreateView(
@@ -122,11 +127,12 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initViews()
+        initView()
     }
 
-    private fun initViews() {
+    private fun initView() {
 
+        iGoogleApi = RetrofitClient.getInstance()!!.create(IGoogleApi::class.java)
         /** Firebase and GeoFire **/
         mAuth = FirebaseAuth.getInstance()
         userId = mAuth.currentUser?.uid.toString()
@@ -450,11 +456,11 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
         mFusedLocationClient.removeLocationUpdates(mLocationCallback)
         geoFire?.removeLocation(FirebaseAuth.getInstance().currentUser?.uid)
         onlineRef.removeEventListener(valueEventListener)
+        compositeDisposable.clear()
+
         if (EventBus.getDefault().hasSubscriberForEvent(DriverRequestReceived::class.java))
             EventBus.getDefault().removeStickyEvent(DriverRequestReceived::class.java)
         EventBus.getDefault().unregister(this)
-
-        compositeDisposable.clear()
 
         super.onDestroy()
         binding = null
@@ -476,20 +482,150 @@ class DriverHomeFragment : Fragment(), OnMapReadyCallback {
         }
         mFusedLocationClient.lastLocation
             .addOnFailureListener {
+                it.message?.let { it1 ->
+                    Snackbar.make(
+                        requireView(),
+                        it1, Snackbar.LENGTH_SHORT
+                    ).show()
+                }
+            }
+            .addOnSuccessListener {
+
+                iGoogleApi?.getDirections(
+                    "driving",
+                    "less_driving",
+                    StringBuilder()
+                        .append(it.latitude)
+                        .append(",")
+                        .append(it.longitude)
+                        .toString(),
+                    event.pickUpLocation, getString(R.string.google_api_key)
+                )
+                    ?.subscribeOn(io.reactivex.schedulers.Schedulers.io())
+                    ?.observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
+                    ?.subscribe { result ->
+
+                        try {
+                            val jsonObj = JSONObject(result!!)
+                            val jsonArray = jsonObj.getJSONArray("routes")
+
+                            for (i in 0 until jsonArray.length()) {
+                                val route = jsonArray.getJSONObject(i)
+                                val poly = route.getJSONObject("overview_polyline")
+                                val polyline = poly.getString("points")
+                                polylineList = Common.decodePoly(polyline)
+                            }
+                            polylineOptions = PolylineOptions()
+                            polylineOptions!!.color(Color.GRAY)
+                            polylineOptions!!.width(12f)
+                            polylineOptions!!.jointType(JointType.ROUND)
+                            polylineOptions!!.startCap(SquareCap())
+                            polylineOptions!!.addAll(polylineList!!)
+                            greyPolyline = mMap?.addPolyline(polylineOptions!!)
+
+                            blackPolylineOptions = PolylineOptions()
+                            blackPolylineOptions!!.color(Color.BLACK)
+                            blackPolylineOptions!!.width(12f)
+                            blackPolylineOptions!!.jointType(JointType.ROUND)
+                            blackPolylineOptions!!.startCap(SquareCap())
+                            blackPolylineOptions!!.addAll(polylineList!!)
+                            blackPolyline = mMap?.addPolyline(blackPolylineOptions!!)
+
+                            //Animator
+                            val valueAnimator = ValueAnimator.ofInt(0, 100)
+                            valueAnimator.duration = 1100
+                            valueAnimator.repeatCount = ValueAnimator.INFINITE
+                            valueAnimator.interpolator = LinearInterpolator()
+                            valueAnimator.addUpdateListener { value ->
+                                val points = greyPolyline!!.points
+                                val percentageValue = value.animatedValue.toString().toInt()
+                                val size = points.size
+                                val newPoints = (size * (percentageValue / 100.0f)).toInt()
+                                val p = points.subList(0, newPoints)
+                                blackPolyline!!.points = p
+                            }
+                            valueAnimator.start()
+
+                            var origin =
+                                LatLng(it.latitude, it.longitude)
+
+                            var destination =
+                                LatLng(
+                                    event?.pickUpLocation!!.split(",")[0].toDouble(),
+                                    event?.pickUpLocation!!.split(",")[1].toDouble()
+                                )
+
+                            val latLngBound =
+                                LatLngBounds.Builder().include(origin)
+                                    .include(destination).build()
+
+                            //add car icon for origin
+
+                            val objects = jsonArray.getJSONObject(0)
+                            val legs = objects.getJSONArray("legs")
+                            val legsObject = legs.getJSONObject(0)
+
+                            val time = legsObject.getJSONObject("duration")
+                            val duration = time.getString("text")
+
+                            val distanceEstimator = legsObject.getJSONObject("distance")
+                            val distance = distanceEstimator.getString("text")
+
+                            tvEstimateTime.text = duration.toString()
+                            tvEstimatedDistance.text = distance.toString()
+
+                            mMap?.addMarker(
+                                MarkerOptions().position(destination)
+                                    .icon(BitmapDescriptorFactory.defaultMarker())
+                                    .title("Pickup Location")
+                            )
+
+                            mMap?.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBound, 160))
+                            mMap?.moveCamera(CameraUpdateFactory.zoomTo(mMap?.cameraPosition!!.zoom - 1))
+
+
+                            //Display Layouts
+                            chipIgnore.visibility = View.VISIBLE
+                            layoutAccept.visibility = View.VISIBLE
+
+                            //countdown
+                            Observable.interval(100, TimeUnit.MILLISECONDS)
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .doOnNext {
+                                    circularProgressBar.progress += 1f
+                                }
+                                .takeUntil { aLong -> aLong == "100".toLong() }
+                                .doOnComplete {
+                                    Toast.makeText(
+                                        context,
+                                        "Fake accept action ",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }.subscribe()
+
+
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }?.let {
+                        compositeDisposable?.add(
+                            it
+                        )
+                    }
 
             }
-       /**    .addOnSuccessListener {
-                val locationStr= StringBuilder()
-                    .append(it.latitude)
-                    .append(",")
-                    .append(it.longitude)
+        /**    .addOnSuccessListener {
+        val locationStr= StringBuilder()
+        .append(it.latitude)
+        .append(",")
+        .append(it.longitude)
 
-                compositeDisposable.add(iGoogleApi.getDirections("driving",
-                    "less_driving",
-                    locationStr.toString(),
-                    event.pickUpLocation,
+        compositeDisposable.add(iGoogleApi.getDirections("driving",
+        "less_driving",
+        locationStr.toString(),
+        event.pickUpLocation,
 
-                ))
-            } **/
+        ))
+        } **/
     }
 }

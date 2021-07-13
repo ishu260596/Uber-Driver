@@ -19,26 +19,27 @@ class MyFirebaseServices : FirebaseMessagingService() {
 
     override fun onMessageReceived(s: RemoteMessage) {
         super.onMessageReceived(s)
-        val dataRec: Map<String, String> = s.data
+        val dataRec = s.data
+        if (dataRec != null) {
 
-        if (dataRec[NOTIFICATION_TITLE].equals(REQUEST_DRIVER_TITLE)) {
+            if (dataRec[NOTIFICATION_TITLE].equals(REQUEST_DRIVER_TITLE)) {
 
-            EventBus.getDefault().postSticky(
-                DriverRequestReceived(
-                    dataRec.get(RIDER_KEY),
-                    dataRec.get(RIDER_PICKUP_LOCATION)
+                EventBus.getDefault().postSticky(
+                    DriverRequestReceived(
+                        dataRec[RIDER_KEY],
+                        dataRec[RIDER_PICKUP_LOCATION]
+                    )  )
+
+            } else {
+                Common.showNotification(
+                    this, Random.nextInt(),
+                    dataRec[NOTIFICATION_TITLE],
+                    dataRec[NOTIFICATION_CONTENT],
+                    null
                 )
-            )
+            }
 
-        } else {
-            Common.showNotification(
-                this, Random.nextInt(),
-                dataRec[NOTIFICATION_TITLE],
-                dataRec[NOTIFICATION_CONTENT],
-                null
-            )
         }
-
     }
 
 }

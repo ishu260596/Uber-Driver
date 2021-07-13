@@ -53,7 +53,7 @@
                 android:padding="@dimen/_16sdp">
 
                 <TextView
-                    android:id="@+id/tvTextUber"
+                    android:id="@+id/tvEstimatedDistance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
