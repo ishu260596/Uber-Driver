@@ -3,7 +3,6 @@ package com.masai.uber.utlis
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -12,7 +11,8 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.maps.model.LatLng
 import com.masai.uber.R
-import com.masai.uber.services.MyFirebaseServices
+import com.masai.uber.model.eventbus.DriverRequestReceived
+import org.greenrobot.eventbus.EventBus
 
 object Common {
     fun showNotification(
@@ -20,17 +20,18 @@ object Common {
         id: Int,
         title: String?,
         body: String?,
-        intent: Intent?
+        intent: Intent?,
+        driverRequestReceived: DriverRequestReceived
     ) {
 
-        var pendingIntent: PendingIntent? = null
+//        var pendingIntent: PendingIntent? = null
 //
 //            if (intent != null) {
-        pendingIntent = PendingIntent.getActivity(
-            context,
-            id, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT
-        )
+//        pendingIntent = PendingIntent.getActivity(
+//            context,
+//            id, intent,
+//            PendingIntent.FLAG_UPDATE_CURRENT
+//        )
 
         val NOTIFICATION_CHANNEL_ID = "ishu.masai.school"
         val notificationManager: NotificationManager =
@@ -67,12 +68,16 @@ object Common {
                     )
             )
 
-        if (pendingIntent != null) {
-            builder.setContentIntent(pendingIntent)
-        }
+//        if (pendingIntent != null) {
+//            builder.setContentIntent(pendingIntent)
+//        }
         val notification = builder.build()
 
         notificationManager.notify(id, notification)
+
+        EventBus.getDefault().postSticky(
+            driverRequestReceived
+        )
 
 //            }
     }

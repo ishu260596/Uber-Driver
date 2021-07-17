@@ -12,8 +12,6 @@ class UserUtils {
     companion object {
         fun updateToken(context: Context, token: String) {
             val tokenModel = TokenModel(token)
-
-
             FirebaseDatabase.getInstance().getReference(KEY_TOKEN_REFERENCE)
                 .child(FirebaseAuth.getInstance().currentUser?.uid.toString())
                 .setValue(tokenModel)
