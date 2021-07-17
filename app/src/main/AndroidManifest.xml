@@ -30,12 +30,6 @@ For WRITE EXTERNAL STORAGE warning you can have a look at this article I hope it
         android:roundIcon="@drawable/ic_uber_15"
         android:supportsRtl="true"
         android:theme="@style/Theme.Uber">
-        <activity android:name=".ui.activities.ReceiptActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -55,7 +49,10 @@ For WRITE EXTERNAL STORAGE warning you can have a look at this article I hope it
             android:name=".ui.activities.StartTripActivity"
             android:label="@string/title_activity_start_trip" />
         <activity android:name=".ui.activities.SplashScreenActivity">
-
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".ui.activities.LaunchFragmentsActivity"
@@ -80,6 +77,9 @@ For WRITE EXTERNAL STORAGE warning you can have a look at this article I hope it
         <activity android:name=".ui.activities.GetStartedActivity" />
         <activity
             android:name=".ui.activities.MainActivity"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.activities.ReceiptActivity"
             android:windowSoftInputMode="adjustResize" />
 
         <service
