@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.masai.uber">
-
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -31,7 +30,6 @@ For WRITE EXTERNAL STORAGE warning you can have a look at this article I hope it
         android:roundIcon="@drawable/ic_uber_15"
         android:supportsRtl="true"
         android:theme="@style/Theme.Uber">
-
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -53,7 +51,6 @@ For WRITE EXTERNAL STORAGE warning you can have a look at this article I hope it
         <activity android:name=".ui.activities.SplashScreenActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -80,6 +77,9 @@ For WRITE EXTERNAL STORAGE warning you can have a look at this article I hope it
         <activity android:name=".ui.activities.GetStartedActivity" />
         <activity
             android:name=".ui.activities.MainActivity"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.activities.ReceiptActivity"
             android:windowSoftInputMode="adjustResize" />
 
         <service
