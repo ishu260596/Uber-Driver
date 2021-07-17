@@ -29,10 +29,11 @@ const val NOTIFICATION_CONTENT = "body"
 const val KEY_TOKEN_REFERENCE = "Token"
 
 //Pickup
-const val RIDER_PICKUP_LOCATION = "PickUpLocation"
+const val RIDER_PICKUP_LOCATION = "PickupLocation"
 const val RIDER_KEY = "RiderKey"
 const val REQUEST_DRIVER_TITLE = "RequestDriver"
-
+const val START_ADDRESS = "StartAddress"
+const val END_ADDRESS = "EndAddress"
 
 
 

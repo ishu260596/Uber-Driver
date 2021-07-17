@@ -63,6 +63,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.android.gms:play-services-auth:19.0.0'
     implementation 'com.google.firebase:firebase-messaging:22.0.0'
+    implementation 'com.google.firebase:firebase-messaging-directboot:22.0.0'
     //dimens
     implementation 'com.intuit.sdp:sdp-android:1.0.6'
     //synth
@@ -114,4 +115,12 @@ dependencies {
     //rxjava
     implementation "io.reactivex.rxjava3:rxjava:3.0.13"
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    //Google places
+    implementation 'com.google.android.libraries.places:places:2.4.0'
+    //Maps utils
+    implementation 'com.google.maps.android:android-maps-utils-v3:2.2.5'
+    //timber
+    implementation 'com.jakewharton.timber:timber:4.7.1'
+    //Alexander
+    implementation 'com.github.jd-alexander:library:1.1.0'
 }

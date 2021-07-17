@@ -74,5 +74,10 @@
     <string name="decline">Decline</string>
     <string name="uber">Uber</string>
     <string name="_4_5">4.5</string>
+    <string name="Accept">Accept</string>
+    <string name="title_activity_start_trip">Map</string>
+    <string name="start_trip">Start Trip</string>
+    <string name="title_activity_route">Map</string>
+    <string name="title_activity_start_journey">Map</string>
 
 </resources>

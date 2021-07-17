@@ -1,5 +1,6 @@
 package com.masai.uber.services
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -20,26 +21,31 @@ class MyFirebaseServices : FirebaseMessagingService() {
     override fun onMessageReceived(s: RemoteMessage) {
         super.onMessageReceived(s)
         val dataRec = s.data
-        if (dataRec != null) {
+        Log.d("tag", "in firebase ${s.data.toString()}")
 
-            if (dataRec[NOTIFICATION_TITLE].equals(REQUEST_DRIVER_TITLE)) {
 
-                EventBus.getDefault().postSticky(
-                    DriverRequestReceived(
-                        dataRec[RIDER_KEY],
-                        dataRec[RIDER_PICKUP_LOCATION]
-                    )  )
+        EventBus.getDefault().postSticky(
+            DriverRequestReceived(
+                dataRec[RIDER_KEY],
+                dataRec[RIDER_PICKUP_LOCATION],
+                dataRec[START_ADDRESS],
+                dataRec[END_ADDRESS]
+            )
+        )
 
-            } else {
-                Common.showNotification(
-                    this, Random.nextInt(),
-                    dataRec[NOTIFICATION_TITLE],
-                    dataRec[NOTIFICATION_CONTENT],
-                    null
-                )
-            }
 
-        }
+        Common.showNotification(
+            this, Random.nextInt(),
+            dataRec[NOTIFICATION_TITLE],
+            dataRec[NOTIFICATION_CONTENT],
+            null
+        , DriverRequestReceived(
+                dataRec[RIDER_KEY],
+                dataRec[RIDER_PICKUP_LOCATION],
+                dataRec[START_ADDRESS],
+                dataRec[END_ADDRESS]
+            )
+        )
     }
-
 }
+
